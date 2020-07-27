@@ -1,0 +1,52 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_:
+
+
+BO_ 123 Message: 8 Vector__XXX
+ SG_ signalWithValues : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ signalWithUnitAndComment : 8|16@1+ (1,0) [0|65535] "deg C" Vector__XXX
+
+BO_ 2147486648 Edgy: 8 Vector__XXX
+ SG_ EdgyUnit : 0|8@1- (1,0) [0|0] "\" ' , ° . ' \" ; :" Vector__XXX
+ SG_ EdgyValues : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ EdgyComment : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ EdgyUnitAndValues : 48|16@1+ (1,0) [0|0] "impossible" Vector__XXX
+
+
+CM_ BO_ 123 "Message comment";
+CM_ SG_ 123 signalWithUnitAndComment "Signal comment";
+CM_ BO_ 2147486648 ": ; > , . < ' \" [ ] { } \ | \\ -- # ' \"";
+CM_ SG_ 2147486648 EdgyUnit "";
+CM_ SG_ 2147486648 EdgyComment "\" ' . , Hallo daar
+
+   
+Hoi";
+VAL_ 123 signalWithValues 0 "Off" 1 "On" 255 "Ignore" 254 "This device is on fire" ;
+VAL_ 2147486648 EdgyValues 0 "Lekker laag" 255 "Edgy: ' \" ° , . \" '" ;
+VAL_ 2147486648 EdgyUnitAndValues 0 "Impossible" ;
