@@ -38,6 +38,10 @@ BO_ 2147486648 Edgy: 8 Vector__XXX
  SG_ EdgyComment : 16|32@1+ (1,0) [0|0] "" Vector__XXX
  SG_ EdgyUnitAndValues : 48|16@1+ (1,0) [0|0] "impossible" Vector__XXX
 
+BO_ 2147486647 Multiplexed: 8 Vector__XXX
+ SG_ Multiplexor M : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ soc m0 : 8|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
 
 CM_ BO_ 123 "Message comment";
 CM_ SG_ 123 signalWithUnitAndComment "Signal comment";
