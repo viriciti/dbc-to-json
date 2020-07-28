@@ -47,5 +47,10 @@ CM_ BO_ 123 "Message comment";
 CM_ SG_ 123 signalWithUnitAndComment "Signal comment";
 CM_ BO_ 2147486648 ": ; > , . < ' \" [ ] { } \ | \\ -- # ' \"";
 CM_ SG_ 2147486648 EdgyUnit "";
+CM_ SG_ 2147486648 EdgyComment "\" ' . , Hallo daar
+
+   
+Hoi";
 VAL_ 123 signalWithValues 0 "Off" 1 "On" 255 "Ignore" 254 "This device is on fire" ;
 VAL_ 2147486648 EdgyValues 0 "Lekker laag" 255 "Edgy: ' \" ° , . \" '" ;
+VAL_ 2147486648 EdgyUnitAndValues 0 "Impossible" ;
