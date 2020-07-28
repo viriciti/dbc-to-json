@@ -1,4 +1,4 @@
-const { splitCanId, extractSignalData } = require("./utils")
+const { splitCanId, extractSignalData, extractValueData } = require("./utils")
 const debug          = require("debug")("transmutator")
 const _              = require("underscore")
 
@@ -26,8 +26,9 @@ const parseDbc = (dbcString) => {
 
 	debug(`dbcData:\n`, dbcData)
 
-	let currentBo = {}
-	const boList = []
+	let currentBo  = {}
+	const boList   = []
+	const valList  = []
 	const warnings = {}
 
 	// Read each line of the parsed .dbc file and run helper functions when the line starts with "BO_, SG_ or VAL_"
@@ -68,17 +69,27 @@ const parseDbc = (dbcString) => {
 				// Throw if wrong size
 				if(line.length < 8 || line.length > 9) throw new Error(`Non-standard SG_ line can't be parsed at line ${index + 1}`)
 
-				try{
+				// Gather all data from SG_ line
+				try {
 					currentBo.signals.push(extractSignalData(line))
 				} catch (e) {
 					throw new Error(`${e.message} on line ${index + 1}`)
 				}
 
-
-				// Gather all data
 				break
 
 			case("VAL_"):
+				if(line.length % 2 !== 0) throw new Error(`Non-standard VAL_ line can't be parsed at line ${index + 1}`)
+				if(line.length < 7) throw new Error(`VAL_ line only contains one state at line ${index + 1}`) // Should be a warning
+
+				let { boLink, sgLink, states } = extractValueData(line)
+
+				valList.push({ boLink, sgLink, states })
+
+				console.log("VALUES\n\n\n\n", valList)
+				break
+
+			case("SIG_VALTYPE_"): // SIG_VALTYPE_ 1024 DoubleSignal0 : 2;
 				break
 
 			default:
@@ -88,9 +99,11 @@ const parseDbc = (dbcString) => {
 
 	boList.push(currentBo)
 
-	// console.log(JSON.stringify(boList, null, 4))
 	// Add VAL_ list to correct SG_
-	// Go over all signals, add the multiplexor start bit/bit length to all multiplexed signals
+
+
+	console.log(JSON.stringify(boList, null, 4))
+	console.log(JSON.stringify(valList, null, 4))
 	// Go over all signals, do the typeOfUnit (deg C -> temperature)
 }
 

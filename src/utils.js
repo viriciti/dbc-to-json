@@ -6,9 +6,9 @@ const splitCanId = (canId) => {
 	let priority, pgn, source
 
 	if(isExtendedFrame) {
-		priority = canId >> 24 & 0xff
-		pgn      = canId >> 8  & 0xffff
 		source   = canId & 0xff
+		pgn      = canId >> 8  & 0xffff
+		priority = canId >> 24 & 0xff
 	} else {
 		pgn = canId
 	}
@@ -16,11 +16,19 @@ const splitCanId = (canId) => {
 	return { isExtendedFrame, priority, pgn, source }
 }
 
+// SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
 const extractSignalData = (line) => {
-	let multiplexer
+	let isMultiplexor, multiplexerValue
 
 	if(line.length === 9 && line[3] === ":") {
-		[multiplexer] = line.splice(2, 1)
+		[rawMultiplexer] = line.splice(2, 1)
+		if(rawMultiplexer === "M") {
+			isMultiplexor = true
+		} else if(rawMultiplexer.charAt(0) === "m") {
+			multiplexerValue = parseInt(rawMultiplexer.substr(1))
+		} else {
+			throw new Error(`Can't read multiplexer ${rawMultiplexer}`)
+		}
 	}
 
 	// TODO edge cases as warnings (return them as Array)
@@ -38,9 +46,35 @@ const extractSignalData = (line) => {
 		offset: parseFloat(offset),
 		min: parseFloat(min),
 		max: parseFloat(max),
-		unit: line[6].slice(1, -1),
-		multiplexer
+		sourceUnit: line[6].slice(1, -1) ? line[6].slice(1, -1) : undefined,
+		isMultiplexor,
+		multiplexerValue,
+		dataType: "int"
 	}
 }
 
-module.exports = { splitCanId, extractSignalData }
+// VAL_ 123 signalWithValues 0 "Off" 1 "On" 255 "Ignore" 254 "This device is on fire" ;
+const extractValueData = (line) => {
+
+	// Starting at index 3, iterate over the states and put them in an array as objects of value/state pairs
+	let index = 3
+	let value, state
+	const valArray = []
+	while(index !== line.length -1) {
+		value = parseInt(line[index])
+		index += 1
+		state = line[index].slice(1, -1)
+		console.log("STATE",state)
+		index += 1
+		valArray.push({ value, state })
+	}
+
+	// Grab the CAN ID and name from indexes 1 and 2 to later link states to correct parameter
+	return {
+		boLink: parseInt(line[1]),
+		sgLink: line[2],
+		states: valArray
+	}
+}
+
+module.exports = { splitCanId, extractSignalData, extractValueData }
