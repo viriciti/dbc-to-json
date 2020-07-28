@@ -1,7 +1,4 @@
 const splitCanId = (canId) => {
-
-	if(isNaN(canId)) throw new Error("CAN ID is not a number")
-
 	let isExtendedFrame = canId > 0xffff
 	let priority, pgn, source
 
@@ -64,7 +61,6 @@ const extractValueData = (line) => {
 		value = parseInt(line[index])
 		index += 1
 		state = line[index].slice(1, -1)
-		console.log("STATE",state)
 		index += 1
 		valArray.push({ value, state })
 	}
