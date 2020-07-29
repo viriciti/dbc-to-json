@@ -1,0 +1,51 @@
+<html>
+	<head>
+		<script src="./bundle.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.css" integrity="sha512-6g9IGCc67eh+xK03Z8ILcnKLbJnKBW+qpEdoUVD/4hBa2Ghiq5dQgeNOGWJfGoe9tdCRM4GpJMnsRXa2FDJp9Q==" crossorigin="anonymous" />
+		<style type="text/css" media="screen">
+			#editor {
+				height: 900px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm py-4">
+					<span>Convert DBC File:</span>
+					<input type="file" id="input">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm">
+					<span>Result:</span>
+					<div id="editor" />
+				</div>
+			</div>
+		</div>
+		<script>
+			const input = document.getElementById("input")
+			input.addEventListener("change", handleFiles, false)
+
+		    const editorHtml = document.getElementById("input")
+		    const editor = ace.edit("editor")
+		    editor.setTheme("ace/theme/monokai")
+		    editor.session.setMode("ace/mode/json")
+		    editor.setReadOnly(true)
+			async function handleFiles() {
+				const [ dbcFile ] = this.files; /* now you can work with the file list */
+				const dbcString = await dbcFile.text()
+
+				let dbcJson
+				try {
+					dbcJson = transmutator(dbcString)
+				} catch (e) {
+					console.log(e)
+					return
+				}
+				editor.env.document.setValue(JSON.stringify(dbcJson, null, 4))
+			}
+		</script>
+	</body>
+</html>

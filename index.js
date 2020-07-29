@@ -1,0 +1,1 @@
+window.transmutator = require ("./src/transmutator");
