@@ -1,3 +1,5 @@
+const { snakeCase } = require("snake-case")
+
 const splitCanId = (canId) => {
 	let isExtendedFrame = canId > 0xffff
 	let priority, pgn, source
@@ -14,7 +16,7 @@ const splitCanId = (canId) => {
 }
 
 // SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
-const extractSignalData = (line) => {
+const extractSignalData = (line, labelPrefix) => {
 	let isMultiplexor, multiplexerValue
 
 	if(line.length === 9 && line[3] === ":") {
@@ -35,6 +37,7 @@ const extractSignalData = (line) => {
 
 	return {
 		name: line[1],
+		label: `${labelPrefix}.${snakeCase(line[1])}`,
 		startBit: parseInt(startBit),
 		bitLength: parseInt(bitLength),
 		isLittleEndian: Boolean(littleEndian),
