@@ -1,6 +1,8 @@
-const { splitCanId, extractSignalData, extractValueData } = require("./utils")
-const debug          = require("debug")("transmutator")
 const _              = require("underscore")
+const debug          = require("debug")("transmutator")
+const { snakeCase }  = require("snake-case")
+
+const { splitCanId, extractSignalData } = require("./utils")
 
 // TODO: remove empty lines without losing link to line number
 const parseDbc = (dbcString) => {
@@ -66,7 +68,18 @@ const parseDbc = (dbcString) => {
 					let { isExtendedFrame, priority, pgn, source } = splitCanId(canId)
 
 					// Add all data fields
-					currentBo = { name, canId, pgn, source, priority, isExtendedFrame, dlc, lineInDbc: (index + 1), signals: [] }
+					currentBo = {
+						canId,
+						pgn,
+						source,
+						name,
+						priority,
+						isExtendedFrame,
+						dlc,
+						signals: [],
+						lineInDbc: (index + 1),
+						label: snakeCase(name)
+					}
 				} catch (e) {
 					throw new Error(`CAN ID \"${canId}\" is not a number at line ${index + 1}`)
 				}
@@ -76,9 +89,8 @@ const parseDbc = (dbcString) => {
 			case("SG_"): // SG_ soc m0 : 8|8@1+ (0.5,0) [0|100] "%" Vector__XXX
 				if(line.length < 8 || line.length > 9) throw new Error(`Non-standard SG_ line can't be parsed at line ${index + 1}`)
 
-				// Gather all data from SG_ line
-				try {
-					currentBo.signals.push(extractSignalData(line))
+				try{
+					currentBo.signals.push(extractSignalData(line, currentBo.label))
 				} catch (e) {
 					throw new Error(`${e.message} in the DBC file on line ${index + 1}`)
 				}
