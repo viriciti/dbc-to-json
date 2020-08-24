@@ -116,7 +116,11 @@ const parseDbc = (dbcString) => {
 		}
 	})
 
-	boList.push(currentBo)
+	if(!_.isEmpty(currentBo))
+		boList.push(currentBo)
+
+	if(!boList.length)
+		throw new Error(`Invalid DBC: Could not find BO_ or SG_ line`)
 
 	// Add VAL_ list to correct SG_
 	valList.forEach((val) => {
