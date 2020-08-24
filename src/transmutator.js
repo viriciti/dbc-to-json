@@ -2,7 +2,7 @@ const _              = require("underscore")
 const debug          = require("debug")("transmutator")
 const { snakeCase }  = require("snake-case")
 
-const { splitCanId, extractSignalData } = require("./utils")
+const { splitCanId, extractSignalData, extractValueData } = require("./utils")
 
 // TODO: remove empty lines without losing link to line number
 const parseDbc = (dbcString) => {
@@ -52,7 +52,7 @@ const parseDbc = (dbcString) => {
 
 				// Get data fields
 				let [, canId, name, dlc] = line
-				
+
 				if(isNaN(canId)) throw new Error(`CAN ID is not a number in the DBC file on line ${index + 1}`)
 
 				name  = name.slice(0, -1)
@@ -116,7 +116,11 @@ const parseDbc = (dbcString) => {
 		}
 	})
 
-	boList.push(currentBo)
+	if(!_.isEmpty(currentBo))
+		boList.push(currentBo)
+
+	if(!boList.length)
+		throw new Error(`Invalid DBC: Could not find BO_ or SG_ line`)
 
 	// Add VAL_ list to correct SG_
 	valList.forEach((val) => {
