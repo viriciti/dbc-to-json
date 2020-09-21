@@ -5,7 +5,7 @@ const { expect }     = require("chai")
 
 describe("Transmutator Tests", () => {
 	it("Should read .dbc file", () => {
-		let dbcString = fs.readFileSync("./meta/test-input/01_EdgyEdgeCases.dbc", "UTF-8")
+		let dbcString = fs.readFileSync("./meta/test-input/02_BreakingCases.dbc", "UTF-8")
 		transmutator(dbcString)
 	})
 
