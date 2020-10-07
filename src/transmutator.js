@@ -47,15 +47,15 @@ const parseDbc = (dbcString) => {
 		switch(line[0]) {
 			case("BO_"): // BO_ 2147486648 Edgy: 8 Vector__XXX
 				if(line.length !== 5) {
-					// throw new Error(`Non-standard BO_ line can't be parsed in the DBC file on line ${index + 1}`)
-					problems.push({severity: "error", line: index + 1, description: "BO_ line does not follow DBC standard (should have five pieces of text/numbers), all parameters in this message won't have a PGN or source."})
+					throw new Error(`BO_ on line ${index + 1} does not follow DBC standard (should have five pieces of text/numbers), all parameters in this message won't have a PGN or source.`)
+					// problems.push({severity: "error", line: index + 1, description: "BO_ line does not follow DBC standard (should have five pieces of text/numbers), all parameters in this message won't have a PGN or source."})
 				}
 
 				// Push previous BO and reset currentBo if not first one
 				if(!_.isEmpty(currentBo)) {
 					if(_.isEmpty(currentBo.signals)) {
 						// throw new Error(`BO_ doesn't contain any parameters in the DBC file on line ${currentBo.lineInDbc}`)
-						problems.push({severity: "info", line: index + 1, description: "BO_ does not contain any SG_ lines; message does not have any parameters."})
+						problems.push({severity: "warning", line: index + 1, description: "BO_ does not contain any SG_ lines; message does not have any parameters."})
 					}
 					boList.push(currentBo)
 					currentBo = {}
@@ -65,8 +65,8 @@ const parseDbc = (dbcString) => {
 				let [, canId, name, dlc] = line
 
 				if(isNaN(canId)) {
-					// throw new Error(`CAN ID is not a number in the DBC file on line ${index + 1}`)
-					problems.push({severity: "error", line: index + 1, description: "BO_ CAN ID is not a number, all parameters in this message won't have a PGN or source."})
+					throw new Error(`BO_ CAN ID on line ${index + 1} is not a number, all parameters in this message won't have a PGN or source.`)
+					// problems.push({severity: "error", line: index + 1, description: "BO_ CAN ID is not a number, all parameters in this message won't have a PGN or source."})
 				}
 				name  = name.slice(0, -1)
 				canId = parseInt(canId)
@@ -97,23 +97,23 @@ const parseDbc = (dbcString) => {
 						label: snakeCase(name)
 					}
 				} catch (e) {
-					// throw new Error(`CAN ID \"${canId}\" is not a number at line ${index + 1}`)
-					problems.push({severity: "error", line: index + 1, description: "BO_ CAN ID is not a number, all parameters in this message won't have a PGN or source."})
+					throw new Error(`BO_ CAN ID on line ${index + 1} is not a number, all parameters in this message won't have a PGN or source.`)
+					// problems.push({severity: "error", line: index + 1, description: "BO_ CAN ID is not a number, all parameters in this message won't have a PGN or source."})
 				}
 
 				break
 
 			case("SG_"): // SG_ soc m0 : 8|8@1+ (0.5,0) [0|100] "%" Vector__XXX
 				if(line.length < 8 || line.length > 9) {
-					// throw new Error(`Non-standard SG_ line can't be parsed at line ${index + 1}`)
-					problems.push({severity: "error", line: index + 1, description: "SG_ line does not follow DBC standard; should have eight pieces of text/numbers (or nine for multiplexed parameters)."})
+					throw new Error(`SG_ line at ${index + 1} does not follow DBC standard; should have eight pieces of text/numbers (or nine for multiplexed parameters).`)
+					// problems.push({severity: "error", line: index + 1, description: "SG_ line does not follow DBC standard; should have eight pieces of text/numbers (or nine for multiplexed parameters)."})
 				}
 
 				try{
 					currentBo.signals.push(extractSignalData(line, currentBo.label))
 				} catch (e) {
 					// throw new Error(`${e.message} in the DBC file on line ${index + 1}`)
-					problems.push({severity: "warning", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number."})
+					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number."})
 				}
 
 				break
@@ -126,7 +126,7 @@ const parseDbc = (dbcString) => {
 
 				if(line.length < 7) {
 					// throw new Error(`VAL_ line only contains one state at line ${index + 1}`) // Should be a warning
-					problems.push({severity: "info", line: index + 1, description: "VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter.does not follow DBC standard; amount of text/numbers in the line should be an even number."})
+					problems.push({severity: "warning", line: index + 1, description: "VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter.does not follow DBC standard; amount of text/numbers in the line should be an even number."})
 				}
 
 				let { boLink, sgLink, states } = extractValueData(line)
@@ -138,6 +138,8 @@ const parseDbc = (dbcString) => {
 			case("SIG_VALTYPE_"): // SIG_VALTYPE_ 1024 DoubleSignal0 : 2;
 				// TODO implement reading Floats/Doubles directly from CAN
 				break
+
+			// TODO match all possible DBC lines to display warning when something outside the standard is shown
 
 			default:
 				debug(`Skipping non implementation line that starts with ${line}`, line)
@@ -168,8 +170,10 @@ const parseDbc = (dbcString) => {
 	// TODO Go over all signals, do the typeOfUnit (deg C -> temperature)
 
 	debug(JSON.stringify(boList, null, 4))
-	console.log("Problems\n", problems)
-	return boList
+	debug(problems)
+
+	let result = {"params": boList, "problems": problems}
+	return result
 }
 
 module.exports = parseDbc
