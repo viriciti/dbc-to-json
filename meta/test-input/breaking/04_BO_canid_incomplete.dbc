@@ -26,7 +26,7 @@ BS_:
 
 BU_:
 
-BO_ 0x12abef42 StandardMessage: 8 Vector__XXX
+BO_ 0xffff1 StandardMessage: 8 Vector__XXX
  SG_ Normal : 0|8@1+ (1,0) [0|0] "A" Vector__XXX
  SG_ Special : 43|12@0- (0.5,-50) [0|0] "V" Vector__XXX
  SG_ States : 8|2@1+ (1,0) [0|0] "" Vector__XXX

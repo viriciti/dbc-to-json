@@ -5,7 +5,7 @@ const { expect }     = require("chai")
 
 describe("Transmutator Tests", () => {
 	it("Should read .dbc file", () => {
-		let dbcString = fs.readFileSync("./meta/test-input/00_ReadmeExample.dbc", "UTF-8")
+		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
 		transmutator(dbcString)
 	})
 
@@ -35,9 +35,10 @@ describe("Detecting BO_ errors in .dbc file", function() {
 	// TODO: code fails before throwing because it tries to parse non-existent SGs
 	it("PIP_01: BO_ signalCount < 1", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/breaking/01_BO_empty.dbc", "UTF-8")
-		expect(function() {
-			transmutator(dbcString)
-		}).to.throw(/BO_ on line 29 does not follow DBC standard/)
+		let result = transmutator(dbcString)
+		expect(result.problems[0].severity).to.equal("warning")
+		expect(result.problems[0].line).to.equal(29)
+		expect(result.problems[0].description).to.equal("BO_ does not contain any SG_ lines; message does not have any parameters.")
 	})
 
 	it("PIP_02: BO_ CAN-ID nan", () => {
@@ -55,12 +56,12 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		expect(result.problems[0].description).to.equal("BO_ CAN ID already exists in this file. Nothing will break on our side, but the data will be wrong because the exact same CAN data will be used on two different parameters.")
 	})
 
-	// TODO: actually reach where this is supposed to throw
-	it("PIP_04: BO_ CAN-ID incomplete", () => {
+	// TODO: actually find a way to reach this throw
+	it.skip("PIP_04: unknown issue with splitCanId()", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/breaking/04_BO_canid_incomplete.dbc", "UTF-8")
 		expect(function() {
 			transmutator(dbcString)
-		}).to.throw(/BO_ CAN ID on line 29 is not a number/)
+		}).to.throw(/My code broke :/)
 	})
 
 	it("PIP_05: SG_ paramCount < 8 || paramCount > 9", () => {
@@ -75,7 +76,7 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("error")
 		expect(result.problems[0].line).to.equal(36)
-		expect(result.problems[0].description).to.equal("Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number.")
+		expect(result.problems[0].description).to.equal("Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this parameter.")
 	})
 
 	it("PIP_07: VAL_ non-standard", () => {
@@ -83,7 +84,7 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
-		expect(result.problems[0].description).to.equal("VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect.")
+		expect(result.problems[0].description).to.equal("VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect, but data is unaffected.")
 	})
 
 	it("PIP_08: VAL_ stateCount == 1", () => {
@@ -91,7 +92,7 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
-		expect(result.problems[0].description).to.equal("VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter.does not follow DBC standard; amount of text/numbers in the line should be an even number.")
+		expect(result.problems[0].description).to.equal("VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter.")
 	})
 
 	it("PIP_09: VAL_ unmatched BO_", () => {

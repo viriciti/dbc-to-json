@@ -55,7 +55,7 @@ const parseDbc = (dbcString) => {
 				if(!_.isEmpty(currentBo)) {
 					if(_.isEmpty(currentBo.signals)) {
 						// throw new Error(`BO_ doesn't contain any parameters in the DBC file on line ${currentBo.lineInDbc}`)
-						problems.push({severity: "warning", line: index + 1, description: "BO_ does not contain any SG_ lines; message does not have any parameters."})
+						problems.push({severity: "warning", line: currentBo.lineInDbc, description: "BO_ does not contain any SG_ lines; message does not have any parameters."})
 					}
 					boList.push(currentBo)
 					currentBo = {}
@@ -97,8 +97,7 @@ const parseDbc = (dbcString) => {
 						label: snakeCase(name)
 					}
 				} catch (e) {
-					throw new Error(`BO_ CAN ID on line ${index + 1} is not a number, all parameters in this message won't have a PGN or source.`)
-					// problems.push({severity: "error", line: index + 1, description: "BO_ CAN ID is not a number, all parameters in this message won't have a PGN or source."})
+					throw new Error(`My code broke :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
 				}
 
 				break
@@ -106,27 +105,24 @@ const parseDbc = (dbcString) => {
 			case("SG_"): // SG_ soc m0 : 8|8@1+ (0.5,0) [0|100] "%" Vector__XXX
 				if(line.length < 8 || line.length > 9) {
 					throw new Error(`SG_ line at ${index + 1} does not follow DBC standard; should have eight pieces of text/numbers (or nine for multiplexed parameters).`)
-					// problems.push({severity: "error", line: index + 1, description: "SG_ line does not follow DBC standard; should have eight pieces of text/numbers (or nine for multiplexed parameters)."})
 				}
 
 				try{
 					currentBo.signals.push(extractSignalData(line, currentBo.label))
 				} catch (e) {
-					// throw new Error(`${e.message} in the DBC file on line ${index + 1}`)
-					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number."})
+					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this parameter."})
 				}
 
 				break
 
 			case("VAL_"):
 				if(line.length % 2 !== 0) {
-					// throw new Error(`Non-standard VAL_ line can't be parsed at line ${index + 1}`)
-					problems.push({severity: "warning", line: index + 1, description: "VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect."})
+					problems.push({severity: "warning", line: index + 1, description: "VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect, but data is unaffected."})
+					return
 				}
 
 				if(line.length < 7) {
-					// throw new Error(`VAL_ line only contains one state at line ${index + 1}`) // Should be a warning
-					problems.push({severity: "warning", line: index + 1, description: "VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter.does not follow DBC standard; amount of text/numbers in the line should be an even number."})
+					problems.push({severity: "warning", line: index + 1, description: "VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter."})
 				}
 
 				let { boLink, sgLink, states } = extractValueData(line)
@@ -156,13 +152,13 @@ const parseDbc = (dbcString) => {
 	valList.forEach((val) => {
 		let bo = _.find(boList, {canId: val.boLink})
 		if(!bo) {
-			// throw new Error(`Can't find matching BO_ with CAN ID ${val.boLink} for VAL_ in the DBC file on line ${val.lineInDbc}`)
-			problems.push({severity: "info", line: index + 1, description: "VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss."})
+			problems.push({severity: "warning", line: val.lineInDbc, description: "VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss."})
+			return
 		}
 		let sg = _.find(bo.signals, {name: val.sgLink})
 		if(!sg) {
-			// throw new Error(`Can't find matching SG_ with name ${val.sgLink} for VAL_ in the DBC file on line ${val.lineInDbc}`)
-			problems.push({severity: "info", line: index + 1, description: "VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing."})
+			problems.push({severity: "warning", line: val.lineInDbc, description: "VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing."})
+			return
 		}
 		sg.states = val.states
 	})
