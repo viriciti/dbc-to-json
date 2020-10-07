@@ -1,0 +1,55 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_:
+
+
+BO_ 123 BrokenBO: 8
+ SG_ BrokenSG: 0|8@1+ (1,0) [0|255]
+
+BO_ VERY BrokenBO: 8 Vector__XXX
+ SG_ BrokenSG: 0|8@1+ (1,0) [0|255]
+ SG_ signalWithUnitAndComment : 8|16@1+ (1,0) [0|65535] "deg C" Vector__XXX
+
+BO_ 2147486649 NoSignals: 8 Vector__XXX
+
+BO_ 2147486647 Multiplexed: 8 Vector__XXX
+ SG_ Multiplexor M : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ soc m0 : 8|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ speed me : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
+
+BO_ 2147486647 Warnings: 8 Vector__XXX
+ SG_ 123425 : 65|8@1- (1,0) [0|0] "\" ' , ° . ' \" ; :" Vector__XXX
+ SG_ EdgyValues : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ EdgyComment : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ EdgyUnitAndValues : 48|16@1+ (1,0) [0|0] "impossible" Vector__XXX
+
+VAL_ 123 BrokenSG 0 "Off" 1 "On" 255 "Ignore" 254 ;
+VAL_ 123 CantFindSG 0 "Off" 1 "On" ;
+VAL_ 1337 CantFindSG 0 "Off" 1 "On" ;
+VAL_ 2147486648 EdgyValues 0 "Lekker laag" 255 "Edgy: ' \" ° , . \" '" ;
+VAL_ 2147486648 EdgyUnitAndValues 0 "Impossible" ;

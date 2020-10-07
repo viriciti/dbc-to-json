@@ -60,7 +60,7 @@ const extractValueData = (line) => {
 	let index = 3
 	let value, state
 	const valArray = []
-	while(index !== line.length -1) {
+	while(index !== line.length - 1) {
 		value = parseInt(line[index])
 		index += 1
 		state = line[index].slice(1, -1)
