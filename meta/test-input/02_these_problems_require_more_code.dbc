@@ -49,6 +49,7 @@ BO_ 2147486647 Warnings: 8 Vector__XXX
  SG_ EdgyUnitAndValues : 48|16@1+ (1,0) [0|0] "impossible" Vector__XXX
 
 VAL_ 123 BrokenSG 0 "Off" 1 "On" 255 "Ignore" 254 ;
+VAL_ 123 BrokenSG 0 "Off" 1 "On" 255 "Ignore" 254 ;
 VAL_ 123 CantFindSG 0 "Off" 1 "On" ;
 VAL_ 1337 CantFindSG 0 "Off" 1 "On" ;
 VAL_ 2147486648 EdgyValues 0 "Lekker laag" 255 "Edgy: ' \" ° , . \" '" ;
