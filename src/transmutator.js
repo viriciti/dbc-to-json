@@ -94,7 +94,8 @@ const parseDbc = (dbcString) => {
 						dlc,
 						signals: [],
 						lineInDbc: (index + 1),
-						label: snakeCase(name)
+						label: snakeCase(name),
+						problems: []
 					}
 				} catch (e) {
 					throw new Error(`My code broke :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
@@ -108,7 +109,7 @@ const parseDbc = (dbcString) => {
 				}
 
 				try{
-					currentBo.signals.push(extractSignalData(line, currentBo.label))
+					currentBo.signals.push(extractSignalData(line, currentBo.label, index + 1))
 				} catch (e) {
 					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this parameter."})
 				}
@@ -116,18 +117,25 @@ const parseDbc = (dbcString) => {
 				break
 
 			case("VAL_"):
+				let problem
+
 				if(line.length % 2 !== 0) {
 					problems.push({severity: "warning", line: index + 1, description: "VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect, but data is unaffected."})
+					//TODO find a way to still save some data, without throwing in extractValueData(), return nothing for now
 					return
 				}
 
 				if(line.length < 7) {
+					//Duplicate so we can also keep storing problems that are not directly linked to one specific message/signal/state
+					//This version will only be sent to front-end to display total list of errors/warnings
 					problems.push({severity: "warning", line: index + 1, description: "VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter."})
+					//This version will be stored in the data model for highlighting in front-end
+					problem = {severity: "warning", line: index + 1, description: "VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter."}
 				}
 
 				let { boLink, sgLink, states } = extractValueData(line)
 
-				valList.push({ boLink, sgLink, states, lineInDbc: (index + 1) })
+				valList.push({ boLink, sgLink, states, lineInDbc: (index + 1), problem: problem })
 
 				break
 
@@ -161,14 +169,41 @@ const parseDbc = (dbcString) => {
 			return
 		}
 		sg.states = val.states
+
+		if(val.problem) {
+			sg.problems.push(val.problem)
+		}
 	})
 
 	// TODO Go over all signals, do the typeOfUnit (deg C -> temperature)
 
-	debug(JSON.stringify(boList, null, 4))
-	debug(problems)
+
+
+	// Add all problems to their corresponding messages and signals
+	problems.forEach((problem) =>  {
+
+		// Search through messages
+		let message = _.find(boList, {lineInDbc: problem.line})
+		if(message) {
+			message.problems.push(problem)
+			return
+		}
+
+		// Search through signals
+		boList.forEach((bo) => {
+			bo.signals.forEach((sg) => {
+				let signal = _.find(sg, {lineInDbc: problem.line})
+				if(signal) {
+					signal.problems.push(problem)
+					return
+				}
+			})
+		})
+	})
 
 	let result = {"params": boList, "problems": problems}
+	debug(JSON.stringify(boList, null, 4))
+	debug(problems)
 	return result
 }
 

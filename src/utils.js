@@ -16,7 +16,7 @@ const splitCanId = (canId) => {
 }
 
 // SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
-const extractSignalData = (line, labelPrefix) => {
+const extractSignalData = (line, labelPrefix, index) => {
 	let isMultiplexor, multiplexerValue
 
 	if(line.length === 9 && line[3] === ":") {
@@ -49,7 +49,11 @@ const extractSignalData = (line, labelPrefix) => {
 		sourceUnit: line[6].slice(1, -1) ? line[6].slice(1, -1) : undefined,
 		isMultiplexor,
 		multiplexerValue,
-		dataType: "int"
+		dataType: "int",
+		visibility: true, // ViriCiti specifc
+		interval: 1000, // ViriCiti specific
+		lineInDbc: index,
+		problems: []
 	}
 }
 
