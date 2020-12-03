@@ -1,5 +1,6 @@
 const transmutator   = require("../src/transmutator")
 const { splitCanId } = require("../src/utils")
+const _              = require("underscore")
 const fs             = require("fs")
 const { expect }     = require("chai")
 
@@ -7,6 +8,13 @@ describe("Transmutator Tests", () => {
 	it("Should read .dbc file", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
 		transmutator(dbcString)
+	})
+
+	it("should skip DM1 messages when configured", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/03_J1939_DM1.dbc", "UTF-8")
+		const messages = transmutator(dbcString, { filterDM1: true })
+		const isDM1Available = _.find(messages.params, { pgn: 65226 })
+		expect(isDM1Available).to.be.undefined
 	})
 
 	it("Should split extended frame CAN ID into PGN, Source and Priority", () => {
