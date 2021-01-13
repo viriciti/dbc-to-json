@@ -1,0 +1,44 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_:
+
+
+BO_ 123 StandardMessage: 8 Vector__XXX
+ SG_ Normal : 0|8@1+ (1,0) [0|0] "A" Vector__XXX
+ SG_ Special : 43|12@0- (0.5,-50) [0|0] "V" Vector__XXX
+ SG_ States : 8|2@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2566906689 ExtendedMessage: 8 Vector__XXX
+ SG_ Multiplexor M : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ BatteryCell1Voltage m0 : 8|16@1+ (1,0) [0|0] "V" Vector__XXX
+ SG_ BatteryCell2Voltage m1 : 8|16@1+ (1,0) [0|0] "V" Vector__XXX
+
+BO_ 65226 ExtendedMessage: 8 Vector__XXX
+ SG_ DM1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;

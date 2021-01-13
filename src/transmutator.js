@@ -5,7 +5,7 @@ const { snakeCase }  = require("snake-case")
 const { splitCanId, extractSignalData, extractValueData } = require("./utils")
 
 // TODO: remove empty lines without losing link to line number
-const parseDbc = (dbcString) => {
+const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
 
 	// Split .dbc file per line, make sure index of this array corresponds to line number in file
@@ -29,7 +29,7 @@ const parseDbc = (dbcString) => {
 	debug(`dbcData:\n`, dbcData)
 
 	let currentBo  = {}
-	const boList   = []
+	let boList   = []
 	const valList  = []
 	// Issues can have three severities:
 	// info    = this won't cause any major problems and will only affect the message/parameter on the current line
@@ -152,6 +152,9 @@ const parseDbc = (dbcString) => {
 
 	if(!_.isEmpty(currentBo))
 		boList.push(currentBo)
+
+	if(options.filterDM1 === true)
+		boList = _.reject(boList, ({pgn}) => pgn === 65226)
 
 	if(!boList.length)
 		throw new Error(`Invalid DBC: Could not find any BO_ or SG_ lines`)
