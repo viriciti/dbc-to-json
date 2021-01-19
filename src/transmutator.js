@@ -4,11 +4,9 @@ const { snakeCase }  = require("snake-case")
 
 const { splitCanId, extractSignalData, extractValueData } = require("./utils")
 
-// TODO: remove empty lines without losing link to line number
 const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
 
-	// Split .dbc file per line, make sure index of this array corresponds to line number in file
 	let dbcArray = dbcString.split("\n")
 
 	debug(`dbcArray:\n`, dbcArray)
@@ -121,7 +119,6 @@ const parseDbc = (dbcString, options = {}) => {
 
 				if(line.length % 2 !== 0) {
 					problems.push({severity: "warning", line: index + 1, description: "VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect, but data is unaffected."})
-					//TODO find a way to still save some data, without throwing in extractValueData(), return nothing for now
 					return
 				}
 
@@ -153,6 +150,8 @@ const parseDbc = (dbcString, options = {}) => {
 	if(!_.isEmpty(currentBo))
 		boList.push(currentBo)
 
+	boList = _.reject(boList, ({pgn}) => pgn === 0)
+
 	if(options.filterDM1 === true)
 		boList = _.reject(boList, ({pgn}) => pgn === 65226)
 
@@ -177,10 +176,6 @@ const parseDbc = (dbcString, options = {}) => {
 			sg.problems.push(val.problem)
 		}
 	})
-
-	// TODO Go over all signals, do the typeOfUnit (deg C -> temperature)
-
-
 
 	// Add all problems to their corresponding messages and signals
 	problems.forEach((problem) =>  {

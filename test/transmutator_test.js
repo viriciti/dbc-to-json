@@ -64,14 +64,6 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		expect(result.problems[0].description).to.equal("BO_ CAN ID already exists in this file. Nothing will break on our side, but the data will be wrong because the exact same CAN data will be used on two different parameters.")
 	})
 
-	// TODO: actually find a way to reach this throw
-	it.skip("PIP_04: unknown issue with splitCanId()", () => {
-		let dbcString = fs.readFileSync("./meta/test-input/breaking/04_BO_canid_incomplete.dbc", "UTF-8")
-		expect(function() {
-			transmutator(dbcString)
-		}).to.throw(/My code broke :/)
-	})
-
 	it("PIP_05: SG_ paramCount < 8 || paramCount > 9", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/breaking/05_SG_not_standard.dbc", "UTF-8")
 		expect(function() {
