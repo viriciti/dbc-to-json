@@ -1,5 +1,6 @@
 const transmutator   = require("../src/transmutator")
 const { splitCanId } = require("../src/utils")
+const _              = require("underscore")
 const fs             = require("fs")
 const { expect }     = require("chai")
 
@@ -9,9 +10,22 @@ describe("Transmutator Tests", () => {
 		transmutator(dbcString)
 	})
 
+	it("should skip DM1 messages when configured", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/03_J1939_DM1.dbc", "UTF-8")
+		const messages = transmutator(dbcString, { filterDM1: true })
+		const isDM1Available = _.find(messages.params, { pgn: 65226 })
+		expect(isDM1Available).to.be.undefined
+	})
+
+	it("should extend signal label with message label if configured", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
+		let dbc = transmutator(dbcString, { extended: true })
+		expect(dbc.params[0].signals[0].label).to.equal("standard_message.normal")
+	})
+
 	it("Should split extended frame CAN ID into PGN, Source and Priority", () => {
 		let isExtendedFrameCanId = 0x98FEAE55
-		let {isExtendedFrame, priority, pgn, source} =splitCanId(isExtendedFrameCanId)
+		let {isExtendedFrame, priority, pgn, source} = splitCanId(isExtendedFrameCanId)
 		expect(isExtendedFrame).to.be.true
 		expect(priority).to.equal(0x98)
 		expect(pgn).to.equal(0xFEAE)
@@ -54,14 +68,6 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(34)
 		expect(result.problems[0].description).to.equal("BO_ CAN ID already exists in this file. Nothing will break on our side, but the data will be wrong because the exact same CAN data will be used on two different parameters.")
-	})
-
-	// TODO: actually find a way to reach this throw
-	it.skip("PIP_04: unknown issue with splitCanId()", () => {
-		let dbcString = fs.readFileSync("./meta/test-input/breaking/04_BO_canid_incomplete.dbc", "UTF-8")
-		expect(function() {
-			transmutator(dbcString)
-		}).to.throw(/My code broke :/)
 	})
 
 	it("PIP_05: SG_ paramCount < 8 || paramCount > 9", () => {

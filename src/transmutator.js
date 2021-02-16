@@ -4,11 +4,9 @@ const { snakeCase }  = require("snake-case")
 
 const { splitCanId, extractSignalData, extractValueData } = require("./utils")
 
-// TODO: remove empty lines without losing link to line number
-const parseDbc = (dbcString) => {
+const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
 
-	// Split .dbc file per line, make sure index of this array corresponds to line number in file
 	let dbcArray = dbcString.split("\n")
 
 	debug(`dbcArray:\n`, dbcArray)
@@ -29,7 +27,7 @@ const parseDbc = (dbcString) => {
 	debug(`dbcData:\n`, dbcData)
 
 	let currentBo  = {}
-	const boList   = []
+	let boList   = []
 	const valList  = []
 	// Issues can have three severities:
 	// info    = this won't cause any major problems and will only affect the message/parameter on the current line
@@ -82,6 +80,10 @@ const parseDbc = (dbcString) => {
 				// Split CAN ID into PGN, source and priority (if isExtendedFrame)
 				try {
 					let { isExtendedFrame, priority, pgn, source } = splitCanId(canId)
+					let label = snakeCase(name)
+
+					if(options.extendedLabel)
+						label = snakeCase(currentBo.name) + label
 
 					// Add all data fields
 					currentBo = {
@@ -90,11 +92,11 @@ const parseDbc = (dbcString) => {
 						source,
 						name,
 						priority,
+						label,
 						isExtendedFrame,
 						dlc,
 						signals: [],
 						lineInDbc: (index + 1),
-						label: snakeCase(name),
 						problems: []
 					}
 				} catch (e) {
@@ -121,7 +123,6 @@ const parseDbc = (dbcString) => {
 
 				if(line.length % 2 !== 0) {
 					problems.push({severity: "warning", line: index + 1, description: "VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect, but data is unaffected."})
-					//TODO find a way to still save some data, without throwing in extractValueData(), return nothing for now
 					return
 				}
 
@@ -153,6 +154,11 @@ const parseDbc = (dbcString) => {
 	if(!_.isEmpty(currentBo))
 		boList.push(currentBo)
 
+	boList = _.reject(boList, ({pgn}) => pgn === 0)
+
+	if(options.filterDM1 === true)
+		boList = _.reject(boList, ({pgn}) => pgn === 65226)
+
 	if(!boList.length)
 		throw new Error(`Invalid DBC: Could not find any BO_ or SG_ lines`)
 
@@ -174,10 +180,6 @@ const parseDbc = (dbcString) => {
 			sg.problems.push(val.problem)
 		}
 	})
-
-	// TODO Go over all signals, do the typeOfUnit (deg C -> temperature)
-
-
 
 	// Add all problems to their corresponding messages and signals
 	problems.forEach((problem) =>  {
