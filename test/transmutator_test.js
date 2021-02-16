@@ -17,9 +17,15 @@ describe("Transmutator Tests", () => {
 		expect(isDM1Available).to.be.undefined
 	})
 
+	it("should extend signal label with message label if configured", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
+		let dbc = transmutator(dbcString, { extended: true })
+		expect(dbc.params[0].signals[0].label).to.equal("standard_message.normal")
+	})
+
 	it("Should split extended frame CAN ID into PGN, Source and Priority", () => {
 		let isExtendedFrameCanId = 0x98FEAE55
-		let {isExtendedFrame, priority, pgn, source} =splitCanId(isExtendedFrameCanId)
+		let {isExtendedFrame, priority, pgn, source} = splitCanId(isExtendedFrameCanId)
 		expect(isExtendedFrame).to.be.true
 		expect(priority).to.equal(0x98)
 		expect(pgn).to.equal(0xFEAE)

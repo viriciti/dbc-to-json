@@ -80,6 +80,10 @@ const parseDbc = (dbcString, options = {}) => {
 				// Split CAN ID into PGN, source and priority (if isExtendedFrame)
 				try {
 					let { isExtendedFrame, priority, pgn, source } = splitCanId(canId)
+					let label = snakeCase(name)
+
+					if(options.extendedLabel)
+						label = snakeCase(currentBo.name) + label
 
 					// Add all data fields
 					currentBo = {
@@ -88,11 +92,11 @@ const parseDbc = (dbcString, options = {}) => {
 						source,
 						name,
 						priority,
+						label,
 						isExtendedFrame,
 						dlc,
 						signals: [],
 						lineInDbc: (index + 1),
-						label: snakeCase(name),
 						problems: []
 					}
 				} catch (e) {
