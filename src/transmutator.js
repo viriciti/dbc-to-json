@@ -166,12 +166,12 @@ const parseDbc = (dbcString, options = {}) => {
 	valList.forEach((val) => {
 		let bo = _.find(boList, {canId: val.boLink})
 		if(!bo) {
-			problems.push({severity: "warning", line: val.lineInDbc, description: "VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss."})
+			problems.push({severity: "warning", line: val.lineInDbc, description: `VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss.`})
 			return
 		}
 		let sg = _.find(bo.signals, {name: val.sgLink})
 		if(!sg) {
-			problems.push({severity: "warning", line: val.lineInDbc, description: "VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing."})
+			problems.push({severity: "warning", line: val.lineInDbc, description: `VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing.`})
 			return
 		}
 		sg.states = val.states
