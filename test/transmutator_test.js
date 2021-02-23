@@ -106,7 +106,7 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
-		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss.")
+		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to BO_ because CAN ID 124 can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss.")
 	})
 
 	it("PIP_10: VAL_ unmatched SG_", () => {
@@ -114,6 +114,6 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
-		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing.")
+		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to SG_ because there's no parameter with the name Status in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing.")
 	})
 })
