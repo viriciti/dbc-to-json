@@ -17,7 +17,7 @@ const splitCanId = (canId) => {
 
 // SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
 const extractSignalData = (line, labelPrefix, index) => {
-	let isMultiplexor, multiplexerValue
+	let isMultiplexor, multiplexerValue, problem, category
 
 	if(line.length === 9 && line[3] === ":") {
 		[rawMultiplexer] = line.splice(2, 1)
@@ -35,6 +35,17 @@ const extractSignalData = (line, labelPrefix, index) => {
 	const [factor, offset] = line[4].slice(1, -1).split(",")
 	const [min, max]       = line[5].slice(1, -1).split("|")
 
+	// TODO only push problem if there is one
+	if((min === 0 && max === 0) || (parseFloat(min) > parseFloat(max))) {
+		problem = {severity: "error", line: index, description: `SG_ ${line[1]} will not show correct data because min/max is wrong at line ${index}.`}
+	}
+
+	if(line[7] !== "Vector__XXX") {
+		category = line[7]
+	} else {
+		category = labelPrefix
+	}
+
 	return {
 		name: line[1],
 		label: `${labelPrefix}.${snakeCase(line[1])}`,
@@ -50,10 +61,12 @@ const extractSignalData = (line, labelPrefix, index) => {
 		isMultiplexor,
 		multiplexerValue,
 		dataType: "int",
+		choking: (parseInt(bitLength) % 8 === 0),
 		visibility: true, // ViriCiti specifc
 		interval: 1000, // ViriCiti specific
+		category: category, // ViriCiti specific
 		lineInDbc: index,
-		problems: []
+		problems: [problem]
 	}
 }
 

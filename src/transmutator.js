@@ -100,7 +100,7 @@ const parseDbc = (dbcString, options = {}) => {
 						problems: []
 					}
 				} catch (e) {
-					throw new Error(`My code broke :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
+					throw new Error(`The parser broke unexpectedly :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
 				}
 
 				break

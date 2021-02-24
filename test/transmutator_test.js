@@ -30,12 +30,20 @@ describe("Transmutator Tests", () => {
 		expect(priority).to.equal(0x98)
 		expect(pgn).to.equal(0xFEAE)
 		expect(source).to.equal(0x55)
+	})
+
+	it("Should output correct JSON", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
+		const output = transmutator(dbcString)
+		// console.log(output)
+		expect(output[0].name).to.equal("StandardMessage")
+	})
 
 		// Add test for non isExtendedFrame
 		// Add test for not finding file
 		// Add test for empty file
 		// Add test for wrong extension
-	})
+
 })
 
 describe("Detecting BO_ errors in .dbc file", function() {
