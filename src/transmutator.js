@@ -4,11 +4,9 @@ const { snakeCase }  = require("snake-case")
 
 const { splitCanId, extractSignalData, extractValueData } = require("./utils")
 
-// TODO: remove empty lines without losing link to line number
-const parseDbc = (dbcString) => {
+const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
 
-	// Split .dbc file per line, make sure index of this array corresponds to line number in file
 	let dbcArray = dbcString.split("\n")
 
 	debug(`dbcArray:\n`, dbcArray)
@@ -29,7 +27,7 @@ const parseDbc = (dbcString) => {
 	debug(`dbcData:\n`, dbcData)
 
 	let currentBo  = {}
-	const boList   = []
+	let boList   = []
 	const valList  = []
 	// Issues can have three severities:
 	// info    = this won't cause any major problems and will only affect the message/parameter on the current line
@@ -82,6 +80,10 @@ const parseDbc = (dbcString) => {
 				// Split CAN ID into PGN, source and priority (if isExtendedFrame)
 				try {
 					let { isExtendedFrame, priority, pgn, source } = splitCanId(canId)
+					let label = snakeCase(name)
+
+					if(options.extendedLabel)
+						label = snakeCase(currentBo.name) + label
 
 					// Add all data fields
 					currentBo = {
@@ -90,15 +92,15 @@ const parseDbc = (dbcString) => {
 						source,
 						name,
 						priority,
+						label,
 						isExtendedFrame,
 						dlc,
 						signals: [],
 						lineInDbc: (index + 1),
-						label: snakeCase(name),
 						problems: []
 					}
 				} catch (e) {
-					throw new Error(`My code broke :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
+					throw new Error(`The parser broke unexpectedly :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
 				}
 
 				break
@@ -109,7 +111,13 @@ const parseDbc = (dbcString) => {
 				}
 
 				try{
-					currentBo.signals.push(extractSignalData(line, currentBo.label, index + 1))
+					signalData = extractSignalData(line, currentBo.label, index + 1)
+
+					if((signalData.min === 0 && signalData.max === 0) || (signalData.min > signalData.max)) {
+						problems.push({severity: "error", line: index + 1, description: `SG_ ${signalData.name} in BO_ ${currentBo.name} will not show correct data because minimum allowed value = ${signalData.min} and maximum allowed value = ${signalData.max}. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.`})
+					}
+
+					currentBo.signals.push(signalData)
 				} catch (e) {
 					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this parameter."})
 				}
@@ -121,7 +129,6 @@ const parseDbc = (dbcString) => {
 
 				if(line.length % 2 !== 0) {
 					problems.push({severity: "warning", line: index + 1, description: "VAL_ line does not follow DBC standard; amount of text/numbers in the line should be an even number. States/values will be incorrect, but data is unaffected."})
-					//TODO find a way to still save some data, without throwing in extractValueData(), return nothing for now
 					return
 				}
 
@@ -153,6 +160,11 @@ const parseDbc = (dbcString) => {
 	if(!_.isEmpty(currentBo))
 		boList.push(currentBo)
 
+	boList = _.reject(boList, ({pgn}) => pgn === 0)
+
+	if(options.filterDM1 === true)
+		boList = _.reject(boList, ({pgn}) => pgn === 65226)
+
 	if(!boList.length)
 		throw new Error(`Invalid DBC: Could not find any BO_ or SG_ lines`)
 
@@ -160,12 +172,12 @@ const parseDbc = (dbcString) => {
 	valList.forEach((val) => {
 		let bo = _.find(boList, {canId: val.boLink})
 		if(!bo) {
-			problems.push({severity: "warning", line: val.lineInDbc, description: "VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss."})
+			problems.push({severity: "warning", line: val.lineInDbc, description: `VAL_ line could not be matched to BO_ because CAN ID ${val.boLink} can not be found in any message. Nothing will break, and if we add the correct values/states later there won't even be any data loss.`})
 			return
 		}
 		let sg = _.find(bo.signals, {name: val.sgLink})
 		if(!sg) {
-			problems.push({severity: "warning", line: val.lineInDbc, description: "VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing."})
+			problems.push({severity: "warning", line: val.lineInDbc, description: `VAL_ line could not be matched to SG_ because there's no parameter with the name ${val.sgLink} in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing.`})
 			return
 		}
 		sg.states = val.states
@@ -174,10 +186,6 @@ const parseDbc = (dbcString) => {
 			sg.problems.push(val.problem)
 		}
 	})
-
-	// TODO Go over all signals, do the typeOfUnit (deg C -> temperature)
-
-
 
 	// Add all problems to their corresponding messages and signals
 	problems.forEach((problem) =>  {
