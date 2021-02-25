@@ -100,7 +100,7 @@ const parseDbc = (dbcString, options = {}) => {
 						problems: []
 					}
 				} catch (e) {
-					throw new Error(`My code broke :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
+					throw new Error(`The parser broke unexpectedly :( Please contact the VT team and send them the DBC file you were trying to parse as well as this error message:\n${e}`)
 				}
 
 				break
@@ -111,7 +111,13 @@ const parseDbc = (dbcString, options = {}) => {
 				}
 
 				try{
-					currentBo.signals.push(extractSignalData(line, currentBo.label, index + 1))
+					signalData = extractSignalData(line, currentBo.label, index + 1)
+
+					if((signalData.min === 0 && signalData.max === 0) || (signalData.min > signalData.max)) {
+						problems.push({severity: "error", line: index + 1, description: `SG_ ${signalData.name} in BO_ ${currentBo.name} will not show correct data because minimum allowed value = ${signalData.min} and maximum allowed value = ${signalData.max}. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.`})
+					}
+
+					currentBo.signals.push(signalData)
 				} catch (e) {
 					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this parameter."})
 				}
