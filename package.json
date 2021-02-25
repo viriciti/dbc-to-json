@@ -22,6 +22,7 @@
     "debug": "^4.1.1",
     "nconf": "^0.10.0",
     "snake-case": "^3.0.3",
+    "title-case": "^3.0.3",
     "underscore": "^1.10.2"
   },
   "devDependencies": {
