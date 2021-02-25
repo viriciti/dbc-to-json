@@ -34,12 +34,12 @@ describe("Transmutator Tests", () => {
 
 	it("Should output correct JSON", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
-		const output = transmutator(dbcString)
-		expect(output.params[0].name).to.equal("StandardMessage")
-		expect(output.params[0].signals[0].category).to.equal("Standard_message")
-		expect(output.params[0].signals[0].choking).to.be.true
-		expect(output.params[0].signals[1].category).to.equal("Example_category")
-		expect(output.params[0].signals[1].choking).to.be.false
+		let result = transmutator(dbcString)
+		expect(result.params[0].name).to.equal("StandardMessage")
+		expect(result.params[0].signals[0].category).to.equal("Standard_message")
+		expect(result.params[0].signals[0].choking).to.be.true
+		expect(result.params[0].signals[1].category).to.equal("Example_category")
+		expect(result.params[0].signals[1].choking).to.be.false
 	})
 
 		// Add test for non isExtendedFrame
@@ -126,5 +126,17 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
 		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to SG_ because there's no parameter with the name Status in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing.")
+	})
+
+	it("PIP_11: SG_ min/max will not result in useful data", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/breaking/11_SG_min_max_issue.dbc", "UTF-8")
+		let result = transmutator(dbcString)
+		expect(result.problems.length).to.equal(2)
+		expect(result.problems[0].severity).to.equal("error")
+		expect(result.problems[0].line).to.equal(32)
+		expect(result.problems[0].description).to.equal("SG_ AlwaysZero in BO_ StandardMessage will not show correct data because minimum allowed value = 0 and maximum allowed value = 0. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
+		expect(result.problems[1].severity).to.equal("error")
+		expect(result.problems[1].line).to.equal(34)
+		expect(result.problems[1].description).to.equal("SG_ IncorrectMinMax in BO_ StandardMessage will not show correct data because minimum allowed value = 5 and maximum allowed value = -5. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
 	})
 })
