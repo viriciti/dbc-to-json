@@ -36,11 +36,6 @@ const extractSignalData = (line, labelPrefix, index) => {
 	const [factor, offset] = line[4].slice(1, -1).split(",")
 	const [min, max]       = line[5].slice(1, -1).split("|")
 
-	// TODO only push problem if there is one
-	if((min === 0 && max === 0) || (parseFloat(min) > parseFloat(max))) {
-		problem = {severity: "error", line: index, description: `SG_ ${line[1]} will not show correct data because min/max is wrong at line ${index}.`}
-	}
-
 	if(line[7] !== "Vector__XXX") {
 		category = line[7]
 	} else {
@@ -67,7 +62,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 		interval: 1000, // ViriCiti specific
 		category: category, // ViriCiti specific
 		lineInDbc: index,
-		problems: [problem]
+		problems: []
 	}
 }
 
