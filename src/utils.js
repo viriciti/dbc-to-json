@@ -1,4 +1,5 @@
 const { snakeCase } = require("snake-case")
+const { titleCase } = require("title-case")
 
 const splitCanId = (canId) => {
 	let isExtendedFrame = canId > 0xffff
@@ -43,7 +44,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 	if(line[7] !== "Vector__XXX") {
 		category = line[7]
 	} else {
-		category = labelPrefix
+		category = titleCase(labelPrefix)
 	}
 
 	return {

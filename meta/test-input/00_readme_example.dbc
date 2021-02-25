@@ -30,7 +30,7 @@ BU_:
 
 BO_ 123 StandardMessage: 8 Vector__XXX
  SG_ Normal : 0|8@1+ (1,0) [0|0] "A" Vector__XXX
- SG_ Special : 43|12@0- (0.5,-50) [0|0] "V" Vector__XXX
+ SG_ Special : 43|12@0- (0.5,-50) [0|0] "V" Example_category
  SG_ States : 8|2@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 2566906689 ExtendedMessage: 8 Vector__XXX

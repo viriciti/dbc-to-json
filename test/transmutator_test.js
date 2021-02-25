@@ -35,8 +35,11 @@ describe("Transmutator Tests", () => {
 	it("Should output correct JSON", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
 		const output = transmutator(dbcString)
-		// console.log(output)
-		expect(output[0].name).to.equal("StandardMessage")
+		expect(output.params[0].name).to.equal("StandardMessage")
+		expect(output.params[0].signals[0].category).to.equal("Standard_message")
+		expect(output.params[0].signals[0].choking).to.be.true
+		expect(output.params[0].signals[1].category).to.equal("Example_category")
+		expect(output.params[0].signals[1].choking).to.be.false
 	})
 
 		// Add test for non isExtendedFrame
