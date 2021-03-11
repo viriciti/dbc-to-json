@@ -188,6 +188,7 @@ const parseDbc = (dbcString, options = {}) => {
 	})
 
 	// Add all problems to their corresponding messages and signals
+	// TODO remove problems from problems when they are pushed to params
 	problems.forEach((problem) =>  {
 
 		// Search through messages

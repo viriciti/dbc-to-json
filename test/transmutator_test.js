@@ -1,4 +1,5 @@
 const transmutator   = require("../src/transmutator")
+const validator      = require("../src/validator")
 const { splitCanId } = require("../src/utils")
 const _              = require("underscore")
 const fs             = require("fs")
@@ -49,7 +50,7 @@ describe("Transmutator Tests", () => {
 
 })
 
-describe("Detecting BO_ errors in .dbc file", function() {
+describe("Detecting errors in source .dbc file", function() {
 	it("PIP_00: BO_ paramCount != 4", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/breaking/00_BO_not_standard.dbc", "UTF-8")
 		expect(function() {
@@ -138,5 +139,13 @@ describe("Detecting BO_ errors in .dbc file", function() {
 		expect(result.problems[1].severity).to.equal("error")
 		expect(result.problems[1].line).to.equal(34)
 		expect(result.problems[1].description).to.equal("SG_ IncorrectMinMax in BO_ StandardMessage will not show correct data because minimum allowed value = 5 and maximum allowed value = -5. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
+	})
+})
+
+describe("Detecting errors in created JSON object", function() {
+	it("Should update problems array", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
+		let result = validator(transmutator(dbcString))
+		expect(result.problems.length).to.equal(0)
 	})
 })
