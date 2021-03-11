@@ -36,6 +36,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 	const [factor, offset] = line[4].slice(1, -1).split(",")
 	const [min, max]       = line[5].slice(1, -1).split("|")
 
+	// Categorizes signals based on source device. If source device has a default value, use the BO_ name
 	if(line[7] !== "Vector__XXX") {
 		category = line[7]
 	} else {
@@ -47,7 +48,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 		label: `${labelPrefix}.${snakeCase(line[1])}`,
 		startBit: parseInt(startBit),
 		bitLength: parseInt(bitLength),
-		isLittleEndian: Boolean(littleEndian),
+		isLittleEndian: Boolean(parseInt(littleEndian)),
 		isSigned: line[3].endsWith("-"),
 		factor: parseFloat(factor),
 		offset: parseFloat(offset),

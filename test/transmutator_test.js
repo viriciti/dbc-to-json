@@ -36,20 +36,40 @@ describe("Transmutator Tests", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
 		let result = transmutator(dbcString)
 		expect(result.params[0].name).to.equal("StandardMessage")
-		expect(result.params[0].signals[0].category).to.equal("Standard_message")
+		expect(result.params[0].signals[0].name).to.equal("Normal")
+		expect(result.params[0].signals[0].label).to.equal("standard_message.normal")
+		expect(result.params[0].signals[0].startBit).to.equal(0)
+		expect(result.params[0].signals[0].bitLength).to.equal(8)
+		expect(result.params[0].signals[0].isLittleEndian).to.be.true
+		expect(result.params[0].signals[0].isSigned).to.be.false
+		expect(result.params[0].signals[0].factor).to.equal(1)
+		expect(result.params[0].signals[0].offset).to.equal(0)
+		expect(result.params[0].signals[0].min).to.equal(0)
+		expect(result.params[0].signals[0].max).to.equal(255)
+		expect(result.params[0].signals[0].sourceUnit).to.equal("A")
+		expect(result.params[0].signals[0].isMultiplexor).to.be.undefined
+		expect(result.params[0].signals[0].multiplexerValue).to.be.undefined
+		expect(result.params[0].signals[0].dataType).to.equal("int")
 		expect(result.params[0].signals[0].choking).to.be.true
+		expect(result.params[0].signals[0].visibility).to.be.true
+		expect(result.params[0].signals[0].interval).to.equal(1000)
+		expect(result.params[0].signals[0].category).to.equal("Standard_message")
+		expect(result.params[0].signals[0].lineInDbc).to.equal(32)
+		expect(result.params[0].signals[0].problems).to.be.empty
+		expect(result.params[0].signals[1].isLittleEndian).to.be.false
+		expect(result.params[0].signals[1].isSigned).to.be.true
 		expect(result.params[0].signals[1].category).to.equal("Example_category")
 		expect(result.params[0].signals[1].choking).to.be.false
+		expect(result.params[1].signals[0].isMultiplexor).to.be.true
+		expect(result.params[1].signals[0].multiplexerValue).to.be.undefined
+		expect(result.params[1].signals[1].isMultiplexor).to.be.undefined
+		expect(result.params[1].signals[1].multiplexerValue).to.equal(0)
 	})
 
-		// Add test for non isExtendedFrame
-		// Add test for not finding file
-		// Add test for empty file
-		// Add test for wrong extension
-
+		// Add test where isExtendedFrame is false
 })
 
-describe("Detecting BO_ errors in .dbc file", function() {
+describe("Detecting errors in .dbc file", function() {
 	it("PIP_00: BO_ paramCount != 4", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/breaking/00_BO_not_standard.dbc", "UTF-8")
 		expect(function() {
