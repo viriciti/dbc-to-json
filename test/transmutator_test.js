@@ -151,12 +151,13 @@ describe("Detecting errors in .dbc file", function() {
 	it("PIP_11: SG_ min/max will not result in useful data", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/breaking/11_SG_min_max_issue.dbc", "UTF-8")
 		let result = transmutator(dbcString)
-		expect(result.problems.length).to.equal(2)
+		expect(result.params[0].signals[0].min).to.be.undefined
+		expect(result.params[0].signals[0].max).to.be.undefined
+		expect(result.problems.length).to.equal(1)
 		expect(result.problems[0].severity).to.equal("error")
-		expect(result.problems[0].line).to.equal(32)
-		expect(result.problems[0].description).to.equal("SG_ AlwaysZero in BO_ StandardMessage will not show correct data because minimum allowed value = 0 and maximum allowed value = 0. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
-		expect(result.problems[1].severity).to.equal("error")
-		expect(result.problems[1].line).to.equal(34)
-		expect(result.problems[1].description).to.equal("SG_ IncorrectMinMax in BO_ StandardMessage will not show correct data because minimum allowed value = 5 and maximum allowed value = -5. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
+		expect(result.problems[0].line).to.equal(34)
+		expect(result.params[0].signals[2].min).to.equal(5)
+		expect(result.params[0].signals[2].max).to.equal(-5)
+		expect(result.problems[0].description).to.equal("SG_ IncorrectMinMax in BO_ StandardMessage will not show correct data because minimum allowed value = 5 and maximum allowed value = -5. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
 	})
 })
