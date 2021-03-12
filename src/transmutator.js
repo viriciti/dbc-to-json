@@ -113,7 +113,13 @@ const parseDbc = (dbcString, options = {}) => {
 				try{
 					signalData = extractSignalData(line, currentBo.label, index + 1)
 
-					if((signalData.min === 0 && signalData.max === 0) || (signalData.min > signalData.max)) {
+					// Since min|max = 0|0 is a default export setting, we allow this, but set them to undefined first
+					if(signalData.min === 0 && signalData.max === 0) {
+						delete(signalData.min)
+						delete(signalData.max)
+					}
+
+					if(signalData.min >= signalData.max) {
 						problems.push({severity: "error", line: index + 1, description: `SG_ ${signalData.name} in BO_ ${currentBo.name} will not show correct data because minimum allowed value = ${signalData.min} and maximum allowed value = ${signalData.max}. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.`})
 					}
 
