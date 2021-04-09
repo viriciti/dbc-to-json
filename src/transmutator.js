@@ -120,6 +120,22 @@ const parseDbc = (dbcString, options = {}) => {
 						problems.push({severity: "error", line: index + 1, description: `SG_ ${signalData.name} in BO_ ${currentBo.name} will not show correct data because minimum allowed value = ${signalData.min} and maximum allowed value = ${signalData.max}. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.`})
 					}
 
+					// Add spacing and auto-generated imperial units
+					if(signalData.sourceUnit) {
+						switch (signalData.sourceUnit) {
+							case "km":
+								signalData.imperialUnit = "mi"
+							case "mi":
+								signalData.sourceUnit = "km"
+								signalData.imperialUnit = "mi"
+							default:
+								signalData.imperialUnit = signalData.sourceUnit
+
+						}
+						console.log(signalData.sourceUnit)
+						signalData.sourceUnit = ` ${signalData.sourceUnit}`
+					}
+
 					currentBo.signals.push(signalData)
 				} catch (e) {
 					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this signal."})
