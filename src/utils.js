@@ -104,6 +104,9 @@ const extractDataTypeData = (line, index) => {
 		case "2":
 			dataType = "double"
 			break
+		case "viricitiGps":
+			dataType = "gps"
+			break;
 		default:
 			throw new Error(`Can't read dataType ${line[4].slice(0, -1)} at line ${index} in the .dbc file. It should either be 0 (int), 1 (float) or 2 (double). This will cause unfixable incorrect data.`)
 	}
@@ -116,4 +119,15 @@ const extractDataTypeData = (line, index) => {
 	}
 }
 
-module.exports = { splitCanId, extractSignalData, extractValData, extractDataTypeData }
+// CM_ 1024 lowGranularitySignal viricitiInterval=10000;
+const extractIntervalData = (line) => {
+	if(line[3].slice(0, 17) === "viricitiInterval=") {
+		return {
+			dataTypeBoLink: parseInt(line[1]),
+			dataTypeSgLink: line[2],
+			interval: parseInt(line[3].slice(17))
+		}
+	}
+}
+
+module.exports = { splitCanId, extractSignalData, extractValData, extractDataTypeData, extractIntervalData }
