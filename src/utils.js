@@ -68,7 +68,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 }
 
 // VAL_ 123 signalWithValues 0 "Off" 1 "On" 255 "Ignore" 254 "This device is on fire" ;
-const extractValueData = (line) => {
+const extractValData = (line) => {
 
 	// Starting at index 3, iterate over the states and put them in an array as objects of value/state pairs
 	let index = 3
@@ -82,12 +82,38 @@ const extractValueData = (line) => {
 		valArray.push({ value, state })
 	}
 
-	// Grab the CAN ID and name from indexes 1 and 2 to later link states to correct parameter
+	// Grab the CAN ID and name from indexes 1 and 2 to later link states to correct signal
 	return {
-		boLink: parseInt(line[1]),
-		sgLink: line[2],
+		valBoLink: parseInt(line[1]),
+		valSgLink: line[2],
 		states: valArray
 	}
 }
 
-module.exports = { splitCanId, extractSignalData, extractValueData }
+// SIG_VALTYPE_ 1024 DoubleSignal0 : 2;
+const extractDataTypeData = (line, index) => {
+	let dataType
+
+	switch(line[4].slice(0, -1)) {
+		case "0":
+			dataType = "int"
+			break;
+		case "1":
+			dataType = "float"
+			break;
+		case "2":
+			dataType = "double"
+			break
+		default:
+			throw new Error(`Can't read dataType ${line[4].slice(0, -1)} at line ${index} in the .dbc file. It should either be 0 (int), 1 (float) or 2 (double). This will cause unfixable incorrect data.`)
+	}
+
+	// Grab the CAN ID and name from indexes 1 and 2 to later link states to correct signal
+	return {
+		dataTypeBoLink: parseInt(line[1]),
+		dataTypeSgLink: line[2],
+		dataType: dataType
+	}
+}
+
+module.exports = { splitCanId, extractSignalData, extractValData, extractDataTypeData }

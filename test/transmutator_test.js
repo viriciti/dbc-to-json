@@ -32,6 +32,7 @@ describe("Transmutator Tests", () => {
 		expect(source).to.equal(0x55)
 	})
 
+	// TODO: split this up in generic dbc-to-json tests and ViriCiti specific tests
 	it("Should output correct JSON", () => {
 		let dbcString = fs.readFileSync("./meta/test-input/00_readme_example.dbc", "UTF-8")
 		let result = transmutator(dbcString)
@@ -66,7 +67,18 @@ describe("Transmutator Tests", () => {
 		expect(result.params[1].signals[1].multiplexerValue).to.equal(0)
 	})
 
-		// Add test where isExtendedFrame is false
+	it("Should parse floats and doubles", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/04_doubles_and_floats.dbc", "UTF-8")
+		let result = transmutator(dbcString)
+		expect(result.params[0].signals[0].name).to.equal("LittleEndianDouble")
+		expect(result.params[0].signals[0].dataType).to.equal("double")
+		expect(result.params[1].signals[1].name).to.equal("BigEndianFloat")
+		expect(result.params[1].signals[1].dataType).to.equal("float")
+		expect(result.params[2].signals[1].name).to.equal("LittleEndianUnsignedInt")
+		expect(result.params[2].signals[1].dataType).to.equal("int")
+
+	})
+	// TODO: add test where isExtendedFrame is false
 })
 
 describe("Detecting errors in .dbc file", function() {
@@ -83,7 +95,7 @@ describe("Detecting errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(29)
-		expect(result.problems[0].description).to.equal("BO_ does not contain any SG_ lines; message does not have any parameters.")
+		expect(result.problems[0].description).to.equal("BO_ does not contain any SG_ lines; message does not have any signals.")
 	})
 
 	it("PIP_02: BO_ CAN-ID nan", () => {
@@ -98,7 +110,7 @@ describe("Detecting errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(34)
-		expect(result.problems[0].description).to.equal("BO_ CAN ID already exists in this file. Nothing will break on our side, but the data will be wrong because the exact same CAN data will be used on two different parameters.")
+		expect(result.problems[0].description).to.equal("BO_ CAN ID already exists in this file. Nothing will break on our side, but the data will be wrong because the exact same CAN data will be used on two different signals.")
 	})
 
 	it("PIP_05: SG_ paramCount < 8 || paramCount > 9", () => {
@@ -113,7 +125,7 @@ describe("Detecting errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("error")
 		expect(result.problems[0].line).to.equal(36)
-		expect(result.problems[0].description).to.equal("Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this parameter.")
+		expect(result.problems[0].description).to.equal("Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this signal.")
 	})
 
 	it("PIP_07: VAL_ non-standard", () => {
@@ -129,7 +141,7 @@ describe("Detecting errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
-		expect(result.problems[0].description).to.equal("VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this parameter.")
+		expect(result.problems[0].description).to.equal("VAL_ line only contains one state, nothing will break but it defeats the purpose of having states/values for this signal.")
 	})
 
 	it("PIP_09: VAL_ unmatched BO_", () => {
@@ -145,7 +157,7 @@ describe("Detecting errors in .dbc file", function() {
 		let result = transmutator(dbcString)
 		expect(result.problems[0].severity).to.equal("warning")
 		expect(result.problems[0].line).to.equal(39)
-		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to SG_ because there's no parameter with the name Status in the DBC file. Nothing will break, but the customer might intend to add another parameter to the DBC file, so they might complain that it's missing.")
+		expect(result.problems[0].description).to.equal("VAL_ line could not be matched to SG_ because there's no signal with the name Status in the DBC file. Nothing will break, but the customer might intend to add another signal to the DBC file, so they might complain that it's missing.")
 	})
 
 	it("PIP_11: SG_ min/max will not result in useful data", () => {
@@ -159,5 +171,30 @@ describe("Detecting errors in .dbc file", function() {
 		expect(result.params[0].signals[2].min).to.equal(5)
 		expect(result.params[0].signals[2].max).to.equal(-5)
 		expect(result.problems[0].description).to.equal("SG_ IncorrectMinMax in BO_ StandardMessage will not show correct data because minimum allowed value = 5 and maximum allowed value = -5. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.")
+	})
+
+	it("PIP_12: SIG_VALTYPE_ not standard", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/breaking/12_SIG_VALTYPE_not_standard.dbc", "UTF-8")
+		expect(function() {
+			transmutator(dbcString)
+		}).to.throw(/SIG_VALTYPE_ line at 37 does not follow DBC standard; should have a CAN ID, signal name and number./)
+	})
+
+	it("PIP_13: SIG_VALTYPE_ dataType not recognized", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/breaking/13_SIG_VALTYPE_dataType_not_recognized.dbc", "UTF-8")
+		expect(function() {
+			transmutator(dbcString)
+		}).to.throw(/read dataType 3 at line 37 in the .dbc file. It should either be 0/)
+	})
+
+	it("PIP_14: SIG_VALTYPE_ unmatched BO_ and SG_", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/breaking/14_SIG_VALTYPE_not_matching_BO_or_SG.dbc", "UTF-8")
+		let result = transmutator(dbcString)
+		expect(result.problems[0].severity).to.equal("warning")
+		expect(result.problems[0].line).to.equal(38)
+		expect(result.problems[0].description).to.equal("SIG_VALTYPE_ line could not be matched to BO_ because CAN ID 2566890273 can not be found in any message. Nothing will break, but the customer might have intended to add another message to the DBC file, so they might complain that it's missing.")
+		expect(result.problems[1].severity).to.equal("warning")
+		expect(result.problems[1].line).to.equal(39)
+		expect(result.problems[1].description).to.equal("SIG_VALTYPE_ line could not be matched to SG_ because there's no signal with the name NotThere in the DBC file. Nothing will break, but the customer might have intended to add another signal to the DBC file, so they might complain that it's missing.")
 	})
 })
