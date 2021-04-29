@@ -120,6 +120,46 @@ const parseDbc = (dbcString, options = {}) => {
 						problems.push({severity: "error", line: index + 1, description: `SG_ ${signalData.name} in BO_ ${currentBo.name} will not show correct data because minimum allowed value = ${signalData.min} and maximum allowed value = ${signalData.max}. Please ask the customer for a new .dbc file with correct min/max values if this errors pops up often.`})
 					}
 
+					// Add spacing and auto-generated imperial units
+					// TODO make stuff for imperial to metric, see meta/05_postfix.dbc
+					if(signalData.sourceUnit) {
+						switch (signalData.sourceUnit) {
+							// Metric sources
+							case "km/h":
+							case "km/u":
+							case "kph":
+								signalData.postfixMetric = "km/h"
+								signalData.postfixImperial  = "mph"
+								break
+							case "km":
+								signalData.postfixMetric = "km"
+								signalData.postfixImperial  = "mi"
+								break
+							case "deg C":
+							case "deg c":
+							case "°C":
+							case "°c":
+							case "�C":
+							case "�c":
+								signalData.postfixMetric = "°C"
+								signalData.postfixImperial  = "°F"
+								break
+							// Imperial sources, convert data to metric
+							default:
+								signalData.postfixMetric = signalData.sourceUnit
+						}
+
+						// Hardcode that odometers/distance trackers are stored in kilometers instead of meters
+						if(signalData.sourceUnit === "m" && (signalData.label.includes("distance") || signalData.label.includes("odometer"))) {
+							// TODO, log postprocessing events like these
+							signalData.postfixMetric = "km"
+							signalData.postfixImperial = "mi"
+							signalData.offset = signalData.offset / 1000
+							signalData.factor = signalData.factor / 1000
+						}
+					}
+
+
 					currentBo.signals.push(signalData)
 				} catch (e) {
 					problems.push({severity: "error", line: index + 1, description: "Can't parse multiplexer data from SG_ line, there should either be \" M \" or \" m0 \" where 0 can be any number. This will lead to incorrect data for this signal."})
