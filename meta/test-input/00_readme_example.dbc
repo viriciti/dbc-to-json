@@ -38,5 +38,12 @@ BO_ 2566906689 ExtendedMessage: 8 Vector__XXX
  SG_ BatteryCell1Voltage m0 : 8|16@1+ (1,0) [0|11] "V" Vector__XXX
  SG_ BatteryCell2Voltage m1 : 8|16@1+ (1,0) [0|12] "V" Vector__XXX
 
+BO_ 1337 DependencyParams: 8 Important
+ SG_ Odo : 0|32@1+ (0.05,0) [0|100000] "km" Vector__XXX
+ SG_ Speed : 32|8@1+ (1,0) [0|150] "km/h" Vector__XXX
+ SG_ SOC : 40|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ Current : 48|8@1+ (4,0) [0|1000] "A" Vector__XXX
+ SG_ Voltage : 56|8@1+ (4,0) [0|1000] "V" Vector__XXX
+
 
 VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
