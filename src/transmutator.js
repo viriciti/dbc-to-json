@@ -123,18 +123,41 @@ const parseDbc = (dbcString, options = {}) => {
 					// Add spacing and auto-generated imperial units
 					if(signalData.sourceUnit) {
 						switch (signalData.sourceUnit) {
+							// Metric sources
+							case "km/h":
+							case "kph":
+								signalData.postfixMetric = "km/h"
+								signalData.imperialUnit  = "mph"
+								break
 							case "km":
-								signalData.imperialUnit = "mi"
-							case "mi":
-								signalData.sourceUnit = "km"
-								signalData.imperialUnit = "mi"
+								signalData.postfixMetric = "km"
+								signalData.imperialUnit  = "mi"
+								break
+							case "deg C":
+							case "deg c":
+							case "°C":
+							case "°c":
+							case "�C":
+							case "�c":
+								signalData.postfixMetric = "°C"
+								signalData.imperialUnit  = "°F"
+								break
+							// Imperial sources, convert data to metric
 							default:
-								signalData.imperialUnit = signalData.sourceUnit
-
+								signalData.postfixMetric = signalData.sourceUnit
 						}
 						console.log(signalData.sourceUnit)
-						signalData.sourceUnit = ` ${signalData.sourceUnit}`
+
+						// Hardcode that odometers/distance trackers are stored in kilometers instead of meters
+						if(signalData.sourceUnit === "m" && (signalData.label.includes("distance") || signalData.label.includes("odometer"))) {
+							// TODO, log postprocessing events like these
+							signalData.postfixMetric = "km"
+							signalData.postfixImperial = "mi"
+							signalData.offset = signalData.offset / 1000
+							signalData.factor = signalData.factor / 1000
+						}
 					}
+
 
 					currentBo.signals.push(signalData)
 				} catch (e) {

@@ -18,7 +18,7 @@ const splitCanId = (canId) => {
 
 // SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
 const extractSignalData = (line, labelPrefix, index) => {
-	let isMultiplexor, multiplexerValue, problem, category
+	let isMultiplexor, multiplexerValue, category
 
 	if(line.length === 9 && line[3] === ":") {
 		[rawMultiplexer] = line.splice(2, 1)
