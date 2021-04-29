@@ -121,17 +121,19 @@ const parseDbc = (dbcString, options = {}) => {
 					}
 
 					// Add spacing and auto-generated imperial units
+					// TODO make stuff for imperial to metric, see meta/05_postfix.dbc
 					if(signalData.sourceUnit) {
 						switch (signalData.sourceUnit) {
 							// Metric sources
 							case "km/h":
+							case "km/u":
 							case "kph":
 								signalData.postfixMetric = "km/h"
-								signalData.imperialUnit  = "mph"
+								signalData.postfixImperial  = "mph"
 								break
 							case "km":
 								signalData.postfixMetric = "km"
-								signalData.imperialUnit  = "mi"
+								signalData.postfixImperial  = "mi"
 								break
 							case "deg C":
 							case "deg c":
@@ -140,13 +142,12 @@ const parseDbc = (dbcString, options = {}) => {
 							case "�C":
 							case "�c":
 								signalData.postfixMetric = "°C"
-								signalData.imperialUnit  = "°F"
+								signalData.postfixImperial  = "°F"
 								break
 							// Imperial sources, convert data to metric
 							default:
 								signalData.postfixMetric = signalData.sourceUnit
 						}
-						console.log(signalData.sourceUnit)
 
 						// Hardcode that odometers/distance trackers are stored in kilometers instead of meters
 						if(signalData.sourceUnit === "m" && (signalData.label.includes("distance") || signalData.label.includes("odometer"))) {

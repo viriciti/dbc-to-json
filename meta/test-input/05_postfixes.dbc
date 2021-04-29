@@ -1,0 +1,53 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_:
+
+BO_ 2566890272 metric: 8 Vector__XXX
+ SG_ temperature1 : 0|8@1+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ distance1 : 0|8@0+ (1,0) [0|0] "km" Vector__XXX
+ SG_ speed1 : 0|8@0+ (1,0) [0|0] "km/h" Vector__XXX
+ SG_ pressure1 : 0|8@0+ (1,0) [0|0] "bar" Vector__XXX
+ SG_ pressure2 : 0|8@0+ (1,0) [0|0] "atm" Vector__XXX
+ SG_ pressure3 : 0|8@0+ (1,0) [0|0] "atm" Vector__XXX
+ SG_ volume1 : 0|8@0+ (1,0) [0|0] "L" Vector__XXX
+ SG_ volume2 : 0|8@0+ (1,0) [0|0] "l" Vector__XXX
+ SG_ volume3 : 0|8@0+ (1,0) [0|0] "liter" Vector__XXX
+
+BO_ 2566890273 imperial: 8 Vector__XXX
+ SG_ temperature2 : 0|8@1+ (1,0) [0|0] "°F" Vector__XXX
+ SG_ temperature3 : 0|8@1+ (1,0) [0|0] "°K" Vector__XXX
+ SG_ distance2 : 0|8@0+ (1,0) [0|0] "mi" Vector__XXX
+ SG_ speed2 : 0|8@0+ (1,0) [0|0] "mph" Vector__XXX
+ SG_ pressure4 : 0|8@0+ (1,0) [0|0] "psi" Vector__XXX
+ SG_ volume4 : 0|8@0+ (1,0) [0|0] "gal" Vector__XXX
+ SG_ weight1 : 0|8@0+ (1,0) [0|0] "lb" Vector__XXX
+ SG_ weight2 : 0|8@0+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 2566890273 special: 8 Vector__XXX
+ SG_ tripdistance : 0|32@1+ (0.5,100) [0|0] "m" Vector__XXX
+ SG_ custom : 0|8@1+ (1,0) [0|0] "bananas" Vector__XXX
