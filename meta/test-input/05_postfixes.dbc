@@ -48,6 +48,6 @@ BO_ 2566890273 imperial: 8 Vector__XXX
  SG_ weight1 : 0|8@0+ (1,0) [0|0] "lb" Vector__XXX
  SG_ weight2 : 0|8@0+ (1,0) [0|0] "lbs" Vector__XXX
 
-BO_ 2566890273 special: 8 Vector__XXX
+BO_ 2566890274 special: 8 Vector__XXX
  SG_ tripdistance : 0|32@1+ (0.5,100) [0|0] "m" Vector__XXX
  SG_ custom : 0|8@1+ (1,0) [0|0] "bananas" Vector__XXX

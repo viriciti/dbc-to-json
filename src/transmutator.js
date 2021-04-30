@@ -127,24 +127,46 @@ const parseDbc = (dbcString, options = {}) => {
 							// Metric sources
 							case "km/h":
 							case "km/u":
+							case "KMPH":
+							case "kmph":
 							case "kph":
-								signalData.postfixMetric = "km/h"
-								signalData.postfixImperial  = "mph"
+								signalData.postfixMetric   = "km/h"
+								signalData.postfixImperial = "mph"
 								break
 							case "km":
-								signalData.postfixMetric = "km"
-								signalData.postfixImperial  = "mi"
+							case "KM":
+								signalData.postfixMetric   = "km"
+								signalData.postfixImperial = "mi"
 								break
 							case "deg C":
 							case "deg c":
+							case "DEG C":
+							case "degc":
+							case "degC":
 							case "°C":
 							case "°c":
 							case "�C":
 							case "�c":
-								signalData.postfixMetric = "°C"
-								signalData.postfixImperial  = "°F"
+								signalData.postfixMetric   = "°C"
+								signalData.postfixImperial = "°F"
+								break
+							case "��":
+							case "C":
+							case "c":
+								if(signalData.label.includes("temp")) {
+									signalData.postfixMetric   = "°C"
+									signalData.postfixImperial = "°F"
+								} else {
+									signalData.postfixMetric = signalData.sourceUnit
+								}
+								break
+							case "KG":
+							case "kg":
+								signalData.postfixMetric   = "kg"
+								signalData.postfixImperial = "lbs"
 								break
 							// Imperial sources, convert data to metric
+							// lbs psi
 							default:
 								signalData.postfixMetric = signalData.sourceUnit
 						}
