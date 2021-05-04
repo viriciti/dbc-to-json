@@ -123,39 +123,115 @@ const parseDbc = (dbcString, options = {}) => {
 					// Add spacing and auto-generated imperial units
 					// TODO make stuff for imperial to metric, see meta/05_postfix.dbc
 					if(signalData.sourceUnit) {
-						switch (signalData.sourceUnit) {
+						switch (signalData.sourceUnit.toLowerCase()) {
 							// Metric sources
 							case "km/h":
 							case "km/u":
+							case "kmph":
 							case "kph":
-								signalData.postfixMetric = "km/h"
-								signalData.postfixImperial  = "mph"
+								signalData.postfixMetric   = "km/h"
+								signalData.postfixImperial = "mph"
 								break
 							case "km":
-								signalData.postfixMetric = "km"
-								signalData.postfixImperial  = "mi"
+								signalData.postfixMetric   = "km"
+								signalData.postfixImperial = "mi"
 								break
-							case "deg C":
+							case "m":
+							case "meter":
+							case "meters":
+								if(signalData.label.includes("distance") || signalData.label.includes("odometer")) {
+									signalData.postfixMetric = "km"
+									signalData.postfixImperial = "mi"
+									signalData.offset = signalData.offset / 1000 // TODO, log postprocessing events like these
+									signalData.factor = signalData.factor / 1000
+								} else {
+									signalData.postfixMetric = signalData.sourceUnit
+								}
+								break
 							case "deg c":
-							case "°C":
+							case "degc":
 							case "°c":
-							case "�C":
 							case "�c":
-								signalData.postfixMetric = "°C"
-								signalData.postfixImperial  = "°F"
+								signalData.postfixMetric   = "°C"
+								signalData.postfixImperial = "°F"
+								break
+							case "��":
+							case "c":
+							case "¡æ":
+								if(signalData.label.includes("temp")) {
+									signalData.postfixMetric   = "°C"
+									signalData.postfixImperial = "°F"
+								} else {
+									signalData.postfixMetric = signalData.sourceUnit
+								}
+								break
+							case "kg":
+								signalData.postfixMetric   = "kg"
+								signalData.postfixImperial = "lbs"
+								break
+							case "l":
+							case "liter":
+							case "liters":
+								signalData.postfixMetric   = "l"
+								signalData.postfixImperial = "gal"
+								break
+							case "l/h":
+							case "l per h":
+								signalData.postfixMetric   = "l/h"
+								signalData.postfixImperial = "gal/h"
+								break
+							case "km/l":
+							case "km per l":
+								signalData.postfixMetric   = "km/l"
+								signalData.postfixImperial = "mpg"
+								break
+							case "l/km":
+							case "l per km":
+								signalData.postfixMetric   = "l/km"
+								signalData.postfixImperial = "gal/mi"
+								break
+							case "kwh/km":
+							case "kwh per km":
+								signalData.postfixMetric   = "kWh/km"
+								signalData.postfixImperial = "kWh/mi"
+								break
+							case "wh/km":
+							case "wh per km":
+								signalData.postfixMetric   = "Wh/km"
+								signalData.postfixImperial = "Wh/mi"
+								break
+							case "kwh/100km":
+							case "kwh/100 km":
+							case "kwh per 100km":
+							case "kwh per 100 km":
+								signalData.postfixMetric   = "kWh/100 km"
+								signalData.postfixImperial = "kWh/100 mi"
+								break
+							case "kpa":
+								signalData.postfixMetric   = "kPa"
+								signalData.postfixImperial = "psi"
 								break
 							// Imperial sources, convert data to metric
+							// case "lbs":
+							// 	signalData.postfixMetric   = "kg"
+							// 	signalData.postfixImperial = "lbs"
+							// 	signalData.factor *= 1
+							// 	signalData.offset *= 1
+							// 	break
+							// case "psi":
+							// 	signalData.postfixMetric   = "kPa"
+							// 	signalData.postfixImperial = "psi"
+							// 	signalData.factor *= 1
+							// 	signalData.offset *= 1
+							// 	break
+							// case "mi":
+							// 	signalData.postfixMetric   = "km"
+							// 	signalData.postfixImperial = "mi"
+							// 	signalData.factor *= 1
+							// 	signalData.offset *= 1
+							// 	break
 							default:
 								signalData.postfixMetric = signalData.sourceUnit
-						}
-
-						// Hardcode that odometers/distance trackers are stored in kilometers instead of meters
-						if(signalData.sourceUnit === "m" && (signalData.label.includes("distance") || signalData.label.includes("odometer"))) {
-							// TODO, log postprocessing events like these
-							signalData.postfixMetric = "km"
-							signalData.postfixImperial = "mi"
-							signalData.offset = signalData.offset / 1000
-							signalData.factor = signalData.factor / 1000
 						}
 					}
 
