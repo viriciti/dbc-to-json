@@ -144,6 +144,8 @@ const parseDbc = (dbcString, options = {}) => {
 									signalData.postfixImperial = "mi"
 									signalData.offset = signalData.offset / 1000 // TODO, log postprocessing events like these
 									signalData.factor = signalData.factor / 1000
+									signalData.factor = signalData.min    / 1000
+									signalData.factor = signalData.max    / 1000
 								} else {
 									signalData.postfixMetric = signalData.sourceUnit
 								}
