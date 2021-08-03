@@ -62,6 +62,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 		visibility: true, // ViriCiti specifc
 		interval: 1000, // ViriCiti specific
 		category: category, // ViriCiti specific
+		comment: null,
 		lineInDbc: index,
 		problems: []
 	}
@@ -116,4 +117,28 @@ const extractDataTypeData = (line, index) => {
 	}
 }
 
-module.exports = { splitCanId, extractSignalData, extractValData, extractDataTypeData }
+// CM_ [<BU_|BO_|SG_> [CAN-ID] [SignalName]] "<DescriptionText>";
+const extractCommentData = (line, index) => {
+	let comment = "";
+
+	let commentBoLink
+	let commentSgLink
+
+	switch (line[1]) {
+		case 'SG_':
+			commentSgLink = line[3]
+			// when there is SG, there is BO case
+		case 'BO_':
+			commentBoLink = parseInt(line[2])
+			comment = line[line.length - 2]
+			break;
+	}
+
+	return {
+		commentBoLink: commentBoLink,
+		commentSgLink: commentSgLink,
+		comment: comment.substr(1, comment.length - 2)
+	}
+}
+
+module.exports = { splitCanId, extractSignalData, extractValData, extractDataTypeData, extractCommentData }

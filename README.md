@@ -1,5 +1,5 @@
 # dbc-to-json
-Converts a .dbc file to a JSON object that contains all BO_, SG_ and VAL_ information.
+Converts a .dbc file to a JSON object that contains all BO_, SG_, VAL_ and CM_ information.
 
 Will also provide a list of possibly incorrect signal definitions (like having both a postfix and a VAL_ entry for the same signal).
 
@@ -20,6 +20,9 @@ BO_ 2566906689 ExtendedMessage: 8 Vector__XXX
  SG_ BatteryCell2Voltage m1 : 8|16@1+ (1,0) [0|0] "V" Vector__XXX
 
 VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
+
+CM_ BO_ 123 "Small description on BO";
+CM_ SG_ 123 Normal "Small description on SG";
 ```
 
 ## Example output
@@ -31,6 +34,7 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
         "name": "StandardMessage",
         "isExtendedFrame": false,
         "dlc": 8,
+        "comment": "Small description on BO",
         "signals": [
             {
                 "name": "Normal",
@@ -44,7 +48,8 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
                 "min": 0,
                 "max": 0,
                 "sourceUnit": "A",
-                "dataType": "int"
+                "dataType": "int",
+                "comment": "Small description on SG"
             },
             {
                 "name": "Special",
@@ -58,7 +63,8 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
                 "min": 0,
                 "max": 0,
                 "sourceUnit": "V",
-                "dataType": "int"
+                "dataType": "int",
+                "comment": null
             },
             {
                 "name": "States",
@@ -89,7 +95,8 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
                         "value": 3,
                         "state": "Unavailable"
                     }
-                ]
+                ],
+                "comment": null
             }
         ],
         "lineInDbc": 31,
@@ -116,7 +123,8 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
                 "min": 0,
                 "max": 0,
                 "isMultiplexor": true,
-                "dataType": "int"
+                "dataType": "int",
+                "comment": null
             },
             {
                 "name": "BatteryCell1Voltage",
@@ -131,7 +139,8 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
                 "max": 0,
                 "sourceUnit": "V",
                 "multiplexerValue": 0,
-                "dataType": "int"
+                "dataType": "int",
+                "comment": null
             },
             {
                 "name": "BatteryCell2Voltage",
@@ -146,7 +155,8 @@ VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
                 "max": 0,
                 "sourceUnit": "V",
                 "multiplexerValue": 1,
-                "dataType": "int"
+                "dataType": "int",
+                "comment": null
             }
         ],
         "lineInDbc": 36,

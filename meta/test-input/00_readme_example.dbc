@@ -47,3 +47,7 @@ BO_ 1337 DependencyParams: 8 Important
 
 
 VAL_ 123 States 0 "Off" 1 "On" 2 "Blinking" 3 "Unavailable" ;
+
+CM_ BO_ 1337 "Small description on BO";
+CM_ SG_ 1337 Speed "Small description on SG";
+CM_ BU_ 1337 "Small description on BU";
