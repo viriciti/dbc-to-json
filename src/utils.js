@@ -18,7 +18,7 @@ const splitCanId = (canId) => {
 
 // SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
 const extractSignalData = (line, labelPrefix, index) => {
-	let isMultiplexor, multiplexerValue, category
+	let isMultiplexor, multiplexerValue, category, comment
 
 	if(line.length === 9 && line[3] === ":") {
 		[rawMultiplexer] = line.splice(2, 1)
@@ -31,10 +31,12 @@ const extractSignalData = (line, labelPrefix, index) => {
 		}
 	}
 
+	
 	// TODO edge cases as warnings (return them as Array)
 	const [startBit, bitLength, littleEndian] = line[3].split(/[^\d]/)
 	const [factor, offset] = line[4].slice(1, -1).split(",")
-	const [min, max]       = line[5].slice(1, -1).split("|")
+	const [min, max] = line[5].slice(1, -1).split("|")
+	let isSigned = line[3].endsWith("-")
 
 	// Categorizes signals based on source device. If source device has a default value, use the BO_ name
 	if(line[7] !== "Vector__XXX") {
@@ -43,13 +45,18 @@ const extractSignalData = (line, labelPrefix, index) => {
 		category = titleCase(labelPrefix)
 	}
 
+	// Automatically sets signed 1-bit signals to unsigned versions to save headaches in business logic later
+	if(bitLength === "1" && isSigned) {
+		isSigned = false
+	}
+
 	return {
 		name: line[1],
 		label: `${labelPrefix}.${snakeCase(line[1])}`,
 		startBit: parseInt(startBit),
 		bitLength: parseInt(bitLength),
 		isLittleEndian: Boolean(parseInt(littleEndian)),
-		isSigned: line[3].endsWith("-"),
+		isSigned: isSigned,
 		factor: parseFloat(factor),
 		offset: parseFloat(offset),
 		min: parseFloat(min),
@@ -62,7 +69,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 		visibility: true, // ViriCiti specifc
 		interval: 1000, // ViriCiti specific
 		category: category, // ViriCiti specific
-		comment: null,
+		comment,
 		lineInDbc: index,
 		problems: []
 	}
