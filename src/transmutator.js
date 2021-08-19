@@ -124,6 +124,13 @@ const parseDbc = (dbcString, options = {}) => {
 					// TODO make stuff for imperial to metric, see meta/05_postfix.dbc
 					if(signalData.sourceUnit) {
 						switch (signalData.sourceUnit.toLowerCase()) {
+							// Some .dbc editors require the unit field to not be empty
+							case "-":
+							case "n/a":
+							case "none":
+								signalData.postfixMetric   = ""
+								signalData.postfixImperial = ""
+								break
 							// Metric sources
 							case "km/h":
 							case "km/u":
@@ -227,6 +234,7 @@ const parseDbc = (dbcString, options = {}) => {
 							// 	signalData.offset *= 1
 							// 	break
 							// case "mi":
+							// case "miles":
 							// 	signalData.postfixMetric   = "km"
 							// 	signalData.postfixImperial = "mi"
 							// 	signalData.factor *= 1
