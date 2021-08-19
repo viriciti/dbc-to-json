@@ -111,6 +111,15 @@ describe("Transmutator Tests", () => {
 		expect(result.params[2].signals[1].postfixImperial).to.be.undefined
 	})
 	// TODO: add test where isExtendedFrame is false
+
+	it("Should convert 1-bit signed integers to 1-bit unsigned integers", () => {
+		let dbcString = fs.readFileSync("./meta/test-input/01_edge_cases.dbc", "UTF-8")
+		let result = transmutator(dbcString)
+		expect(result.params[3].signals[0].name).to.equal("shouldConvert")
+		expect(result.params[3].signals[0].isSigned).to.be.false
+		expect(result.params[3].signals[1].name).to.equal("shouldNotConvert")
+		expect(result.params[3].signals[1].isSigned).to.be.true
+	})
 })
 
 describe("Detecting errors in .dbc file", function() {
