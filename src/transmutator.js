@@ -2,7 +2,9 @@ const _              = require("underscore")
 const debug          = require("debug")("transmutator")
 const { snakeCase }  = require("snake-case")
 
-const { splitCanId, extractSignalData, extractValData, extractDataTypeData } = require("./utils")
+const { splitCanId, extractSignalData, extractValData, extractDataTypeData, extractCommentData} = require("./utils")
+
+// Spec : https://github.com/stefanhoelzl/CANpy/blob/master/docs/DBC_Specification.md
 
 const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
@@ -30,6 +32,7 @@ const parseDbc = (dbcString, options = {}) => {
 	let boList         = []
 	const valList      = []
 	const dataTypeList = []
+	const commentList = []
 	const problems     = [] // TODO add fourth problem severity
 	// TODO change some throws into warnings (and remove lineInDbc from BO_)
 
@@ -92,6 +95,7 @@ const parseDbc = (dbcString, options = {}) => {
 						label,
 						isExtendedFrame,
 						dlc,
+						comment : null,
 						signals: [],
 						lineInDbc: (index + 1),
 						problems: []
@@ -289,6 +293,18 @@ const parseDbc = (dbcString, options = {}) => {
 				dataTypeList.push({ dataTypeBoLink, dataTypeSgLink, dataType, lineInDbc: (index + 1), problem: dataTypeProblem })
 					break
 
+			case("CM_"): // CM_ [<BU_|BO_|SG_> [CAN-ID] [SignalName]] "<DescriptionText>";
+				if(line.length < 4) {
+					throw new Error(`CM_ line at ${index + 1} does not follow DBC standard; should have one of (BU_, BO_ or SG_) type, CAN ID, signal name and comment.`)
+					// problems.push({severity: "error", line: index + 1, description: "CM_ line does not follow DBC standard; should have one of (BU_, BO_ or SG_) type, CAN ID, signal name and comment."})
+					return
+				}
+
+				let { commentBoLink, commentSgLink, comment } = extractCommentData(line, index + 1)
+
+				commentList.push({ commentBoLink, commentSgLink, comment, lineInDbc: (index + 1), problem: null })
+					break
+
 			default:
 				debug(`Skipping non implementation line that starts with ${line}`, line)
 		}
@@ -342,6 +358,31 @@ const parseDbc = (dbcString, options = {}) => {
 
 		if(dataType.problem) {
 			sg.problems.push(dataType.problem)
+		}
+	})
+
+	// Add CM list to correct CM_
+	commentList.forEach((comment) => {
+		let bo = _.find(boList, {canId: comment.commentBoLink})
+		if(!bo) {
+			problems.push({severity: "warning", line: comment.lineInDbc, description: `CM_ line could not be matched to BO_ because CAN ID ${comment.dataTypeBoLink} can not be found in any message. Nothing will break, but the customer might have intended to add another message to the DBC file, so they might complain that it's missing.`})
+			return
+		}
+		let sg = _.find(bo.signals, {name: comment.commentSgLink})
+		if(!sg) {
+			bo.comment = comment.comment;
+
+			if(comment.problem) {
+				bo.problems.push(comment.problem)
+			}
+
+			return;
+		}
+
+		sg.comment = comment.comment
+
+		if(comment.problem) {
+			sg.problems.push(comment.problem)
 		}
 	})
 

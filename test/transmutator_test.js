@@ -65,6 +65,8 @@ describe("Transmutator Tests", () => {
 		expect(result.params[1].signals[0].multiplexerValue).to.be.undefined
 		expect(result.params[1].signals[1].isMultiplexor).to.be.undefined
 		expect(result.params[1].signals[1].multiplexerValue).to.equal(0)
+		expect(result.params[2].signals[1].comment).to.equal('Small description on SG')
+		expect(result.params[2].comment).to.equal('Small description on BO')
 	})
 
 	it("Should parse floats and doubles", () => {
