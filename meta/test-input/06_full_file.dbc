@@ -1,0 +1,91 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_:
+
+Odo, speed, current, voltage, soc
+Conversion m to km
+postfix imperial
+Error/warning signals
+States
+floats
+Signed, BE weird masking/bitshifting
+Min max
+Mux
+Categories
+Long/short CAN IDs
+
+BO_ 123 mappedParamsVehicle: 8 Important
+ SG_ odometer : 0|32@1+ (0.5,0) [0|2147482647] "m" Vector__XXX
+ SG_ speed : 32|8@1+ (1,0) [0|255] "km/h" Vector__XXX
+
+BO_ 123 mappedParamsBms: 8 Important
+ SG_ current : 0|32@1+ (0.5,0) [0|2147482647] "A" Vector__XXX
+ SG_ voltage : 32|8@1+ (1,0) [0|255] "V" Vector__XXX
+ SG_ soc : 32|8@1+ (1,0) [0|255] "%" Vector__XXX
+
+BO_ 123 Message: 8 Vector__XXX
+ SG_ signalWithValues : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ signalWithUnitAndComment : 8|16@1+ (1,0) [0|65535] "deg C" Vector__XXX
+
+BO_ 2147486648 Edgy: 8 Vector__XXX
+ SG_ EdgyUnit : 0|8@1- (1,0) [0|0] "\" ' , ° . ' \" ; :" Vector__XXX
+ SG_ EdgyValues : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ EdgyComment : 16|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ EdgyUnitAndValues : 48|16@1+ (1,0) [0|0] "impossible" Vector__XXX
+
+BO_ 2147486647 Multiplexed: 8 Vector__XXX
+ SG_ Multiplexor M : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ soc m0 : 8|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
+
+
+
+BO_ 2566890272 metric: 8 Vector__XXX
+ SG_ temperature1 : 0|8@1+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ distance1 : 0|8@0+ (1,0) [0|0] "km" Vector__XXX
+ SG_ speed1 : 0|8@0+ (1,0) [0|0] "km/h" Vector__XXX
+ SG_ pressure1 : 0|8@0+ (1,0) [0|0] "bar" Vector__XXX
+ SG_ pressure2 : 0|8@0+ (1,0) [0|0] "atm" Vector__XXX
+ SG_ pressure3 : 0|8@0+ (1,0) [0|0] "atm" Vector__XXX
+ SG_ volume1 : 0|8@0+ (1,0) [0|0] "L" Vector__XXX
+ SG_ volume2 : 0|8@0+ (1,0) [0|0] "l" Vector__XXX
+ SG_ volume3 : 0|8@0+ (1,0) [0|0] "liter" Vector__XXX
+
+BO_ 2566890273 imperial: 8 Vector__XXX
+ SG_ temperature2 : 0|8@1+ (1,0) [0|0] "°F" Vector__XXX
+ SG_ temperature3 : 0|8@1+ (1,0) [0|0] "°K" Vector__XXX
+ SG_ distance2 : 0|8@0+ (1,0) [0|0] "mi" Vector__XXX
+ SG_ speed2 : 0|8@0+ (1,0) [0|0] "mph" Vector__XXX
+ SG_ pressure4 : 0|8@0+ (1,0) [0|0] "psi" Vector__XXX
+ SG_ volume4 : 0|8@0+ (1,0) [0|0] "gal" Vector__XXX
+ SG_ weight1 : 0|8@0+ (1,0) [0|0] "lb" Vector__XXX
+ SG_ weight2 : 0|8@0+ (1,0) [0|0] "lbs" Vector__XXX
+
+BO_ 2566890274 special: 8 Vector__XXX
+ SG_ tripdistance : 0|32@1+ (0.5,100) [0|0] "m" Vector__XXX
+ SG_ custom : 0|8@1+ (1,0) [0|0] "bananas" Vector__XXX
