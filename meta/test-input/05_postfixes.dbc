@@ -39,7 +39,7 @@ BO_ 2566890272 metric: 8 Vector__XXX
  SG_ volume3 : 0|8@0+ (1,0) [0|0] "liter" Vector__XXX
 
 BO_ 2566890273 imperial: 8 Vector__XXX
- SG_ temperature2 : 0|8@1+ (1,0) [0|0] "°F" Vector__XXX
+ SG_ temperature2 : 0|8@1+ (1,0) [0|200] "°F" Vector__XXX
  SG_ temperature3 : 0|8@1+ (1,0) [0|0] "°K" Vector__XXX
  SG_ distance2 : 0|8@0+ (1,0) [0|0] "mi" Vector__XXX
  SG_ speed2 : 0|8@0+ (1,0) [0|0] "mph" Vector__XXX

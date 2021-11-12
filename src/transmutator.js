@@ -6,6 +6,11 @@ const { splitCanId, extractSignalData, extractValData, extractDataTypeData, extr
 
 // Spec : https://github.com/stefanhoelzl/CANpy/blob/master/docs/DBC_Specification.md
 
+const milesToKilometersFactor              = 1.609344
+const poundsToKilogramFactor               = 0.45359237
+const gallonsToLitersFactor                = 3.785411784
+const kiloPascalToPoundPerSquareInchFactor = 6.894757293
+
 const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
 
@@ -141,39 +146,49 @@ const parseDbc = (dbcString, options = {}) => {
 							case "kmph":
 							case "kph":
 								signalData.postfixMetric   = "km/h"
-								signalData.postfixImperial = "mph"
+								signalData.postfixImperial = "mi/h"
 								break
+							case "kilometer":
+							case "kilometers":
 							case "km":
 								signalData.postfixMetric   = "km"
 								signalData.postfixImperial = "mi"
 								break
 							case "m":
-							case "meter":
-							case "meters":
-								if(signalData.label.includes("distance") || signalData.label.includes("odometer")) {
+								if(signalData.label.includes("distance") || signalData.label.includes("odo")) {
 									signalData.postfixMetric = "km"
 									signalData.postfixImperial = "mi"
-									signalData.offset = signalData.offset / 1000 // TODO, log postprocessing events like these
-									signalData.factor = signalData.factor / 1000
+									signalData.factor = signalData.factor / 1000 // TODO, log postprocessing events like these
+									signalData.offset = signalData.offset / 1000
 									signalData.min = signalData.min / 1000
 									signalData.max = signalData.max / 1000
 								} else {
 									signalData.postfixMetric = signalData.sourceUnit
 								}
 								break
+							case "meter":
+							case "meters":
+								signalData.postfixMetric = "km"
+								signalData.postfixImperial = "mi"
+								signalData.factor = signalData.factor / 1000
+								signalData.offset = signalData.offset / 1000
+								signalData.min = signalData.min / 1000
+								signalData.max = signalData.max / 1000
+								break
 							case "deg c":
 							case "degc":
 							case "°c":
+							case "℃":
 							case "�c":
-								signalData.postfixMetric   = "°C"
-								signalData.postfixImperial = "°F"
+								signalData.postfixMetric   = "℃"
+								signalData.postfixImperial = "℉"
 								break
 							case "��":
-							case "c":
+							case "c": // TODO, log risky one character conversions like these, might not always be the intended unit
 							case "¡æ":
 								if(signalData.label.includes("temp")) {
-									signalData.postfixMetric   = "°C"
-									signalData.postfixImperial = "°F"
+									signalData.postfixMetric   = "℃"
+									signalData.postfixImperial = "℉"
 								} else {
 									signalData.postfixMetric = signalData.sourceUnit
 								}
@@ -196,12 +211,16 @@ const parseDbc = (dbcString, options = {}) => {
 							case "km/l":
 							case "km per l":
 								signalData.postfixMetric   = "km/l"
-								signalData.postfixImperial = "mpg"
+								signalData.postfixImperial = "mi/gal"
 								break
 							case "l/km":
 							case "l per km":
+							case "liter per km":
+							case "liters per km":
+							case "liters per kilometer":
+							case "liters per kilometers":
 								signalData.postfixMetric   = "l/km"
-								signalData.postfixImperial = "gal/mi"
+								signalData.postfixImperial = "mi/gal"
 								break
 							case "kwh/km":
 							case "kwh per km":
@@ -224,26 +243,68 @@ const parseDbc = (dbcString, options = {}) => {
 								signalData.postfixMetric   = "kPa"
 								signalData.postfixImperial = "psi"
 								break
-							// Imperial sources, convert data to metric
-							// case "lbs":
-							// 	signalData.postfixMetric   = "kg"
-							// 	signalData.postfixImperial = "lbs"
-							// 	signalData.factor *= 1
-							// 	signalData.offset *= 1
-							// 	break
-							// case "psi":
-							// 	signalData.postfixMetric   = "kPa"
-							// 	signalData.postfixImperial = "psi"
-							// 	signalData.factor *= 1
-							// 	signalData.offset *= 1
-							// 	break
-							// case "mi":
-							// case "miles":
-							// 	signalData.postfixMetric   = "km"
-							// 	signalData.postfixImperial = "mi"
-							// 	signalData.factor *= 1
-							// 	signalData.offset *= 1
-							// 	break
+							// Imperial sources; convert factor/offset/min/max so everything in our database is metric
+							// Note: this rarely happens in practice, OEMs almost always use SI/metric
+							case "mi":
+							case "miles":
+								signalData.postfixMetric   = "km"
+								signalData.postfixImperial = "mi"
+								signalData.factor *= milesToKilometersFactor
+								signalData.offset *= milesToKilometersFactor
+								signalData.min    *= milesToKilometersFactor
+								signalData.max    *= milesToKilometersFactor
+								break
+							case "m":
+								if(signalData.label.includes("mile")) {
+									signalData.postfixMetric = "km"
+									signalData.postfixImperial = "mi"
+									signalData.factor *= milesToKilometersFactor
+									signalData.offset *= milesToKilometersFactor
+									signalData.min    *= milesToKilometersFactor
+									signalData.max    *= milesToKilometersFactor
+								} else {
+									signalData.postfixMetric = signalData.sourceUnit
+								}
+								break
+							case "deg f":
+							case "degf":
+							case "°f":
+							case "℉":
+							case "�f":
+								signalData.postfixMetric   = "℃"
+								signalData.postfixImperial = "℉"
+								signalData.offset = (signalData.offset - 32) * (5/9)
+								signalData.min    = (signalData.min - 32) * (5/9)
+								signalData.max    = (signalData.max - 32) * (5/9)
+								break
+							case "lbs":
+							case "pound":
+							case "pounds":
+								signalData.postfixMetric   = "kg"
+								signalData.postfixImperial = "lbs"
+								signalData.factor *= poundsToKilogramFactor
+								signalData.offset *= poundsToKilogramFactor
+								signalData.min    *= poundsToKilogramFactor
+								signalData.max    *= poundsToKilogramFactor
+								break
+							case "gal": // TODO, support the very rare mi/gal
+							case "gallon":
+							case "gallons":
+								signalData.postfixMetric   = "kg"
+								signalData.postfixImperial = "lbs"
+								signalData.factor *= gallonsToLitersFactor
+								signalData.offset *= gallonsToLitersFactor
+								signalData.min    *= gallonsToLitersFactor
+								signalData.max    *= gallonsToLitersFactor
+								break
+							case "psi":
+								signalData.postfixMetric   = "kPa"
+								signalData.postfixImperial = "psi"
+								signalData.factor *= kiloPascalToPoundPerSquareInchFactor
+								signalData.offset *= kiloPascalToPoundPerSquareInchFactor
+								signalData.min    *= kiloPascalToPoundPerSquareInchFactor
+								signalData.max    *= kiloPascalToPoundPerSquareInchFactor
+								break
 							default:
 								signalData.postfixMetric = signalData.sourceUnit
 						}

@@ -85,8 +85,8 @@ describe("Transmutator Tests", () => {
 		let result = transmutator(dbcString)
 		expect(result.params[0].signals[0].name).to.equal("temperature1")
 		expect(result.params[0].signals[0].sourceUnit).to.equal("°C")
-		expect(result.params[0].signals[0].postfixMetric).to.equal("°C")
-		expect(result.params[0].signals[0].postfixImperial).to.equal("°F")
+		expect(result.params[0].signals[0].postfixMetric).to.equal("℃")
+		expect(result.params[0].signals[0].postfixImperial).to.equal("℉")
 
 		expect(result.params[0].signals[1].name).to.equal("distance1")
 		expect(result.params[0].signals[1].sourceUnit).to.equal("km")
@@ -96,7 +96,16 @@ describe("Transmutator Tests", () => {
 		expect(result.params[0].signals[2].name).to.equal("speed1")
 		expect(result.params[0].signals[2].sourceUnit).to.equal("km/h")
 		expect(result.params[0].signals[2].postfixMetric).to.equal("km/h")
-		expect(result.params[0].signals[2].postfixImperial).to.equal("mph")
+		expect(result.params[0].signals[2].postfixImperial).to.equal("mi/h")
+
+		expect(result.params[1].signals[0].name).to.equal("temperature2")
+		expect(result.params[1].signals[0].sourceUnit).to.equal("°F")
+		expect(result.params[1].signals[0].postfixMetric).to.equal("℃")
+		expect(result.params[1].signals[0].postfixImperial).to.equal("℉")
+		expect(result.params[1].signals[0].min).to.be.above(-17.778)
+		expect(result.params[1].signals[0].min).to.be.below(-17.777)
+		expect(result.params[1].signals[0].max).to.be.above(93.333)
+		expect(result.params[1].signals[0].max).to.be.below(93.334)
 
 		expect(result.params[2].signals[0].name).to.equal("tripdistance")
 		expect(result.params[2].signals[0].sourceUnit).to.equal("m")
