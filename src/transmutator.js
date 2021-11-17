@@ -180,15 +180,15 @@ const parseDbc = (dbcString, options = {}) => {
 							case "°c":
 							case "℃":
 							case "�c":
-								signalData.postfixMetric   = "℃"
-								signalData.postfixImperial = "℉"
+								signalData.postfixMetric   = "°C"
+								signalData.postfixImperial = "°F"
 								break
 							case "��":
 							case "c": // TODO, log risky one character conversions like these, might not always be the intended unit
 							case "¡æ":
 								if(signalData.label.includes("temp")) {
-									signalData.postfixMetric   = "℃"
-									signalData.postfixImperial = "℉"
+									signalData.postfixMetric   = "°C"
+									signalData.postfixImperial = "°F"
 								} else {
 									signalData.postfixMetric = signalData.sourceUnit
 								}
@@ -271,8 +271,8 @@ const parseDbc = (dbcString, options = {}) => {
 							case "°f":
 							case "℉":
 							case "�f":
-								signalData.postfixMetric   = "℃"
-								signalData.postfixImperial = "℉"
+								signalData.postfixMetric   = "°C"
+								signalData.postfixImperial = "°F"
 								signalData.offset = (signalData.offset - 32) * (5/9)
 								signalData.min    = (signalData.min - 32) * (5/9)
 								signalData.max    = (signalData.max - 32) * (5/9)
