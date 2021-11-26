@@ -266,6 +266,16 @@ const parseDbc = (dbcString, options = {}) => {
 									signalData.postfixMetric = signalData.sourceUnit
 								}
 								break
+							case "mi/h":
+							case "mph":
+							case "miles per hour":
+								signalData.postfixMetric   = "km/h"
+								signalData.postfixImperial = "mi/h"
+								signalData.factor *= milesToKilometersFactor
+								signalData.offset *= milesToKilometersFactor
+								signalData.min    *= milesToKilometersFactor
+								signalData.max    *= milesToKilometersFactor
+								break
 							case "deg f":
 							case "degf":
 							case "°f":
