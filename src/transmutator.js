@@ -10,6 +10,7 @@ const milesToKilometersFactor              = 1.609344
 const poundsToKilogramFactor               = 0.45359237
 const gallonsToLitersFactor                = 3.785411784
 const kiloPascalToPoundPerSquareInchFactor = 6.894757293
+const barTokiloPascalFactor                = 100
 
 const parseDbc = (dbcString, options = {}) => {
 	debug(`The raw dbcString:\n`, dbcString)
@@ -185,6 +186,7 @@ const parseDbc = (dbcString, options = {}) => {
 								break
 							case "��":
 							case "c": // TODO, log risky one character conversions like these, might not always be the intended unit
+							case "oc":
 							case "¡æ":
 								if(signalData.label.includes("temp")) {
 									signalData.postfixMetric   = "°C"
@@ -242,6 +244,14 @@ const parseDbc = (dbcString, options = {}) => {
 							case "kpa":
 								signalData.postfixMetric   = "kPa"
 								signalData.postfixImperial = "psi"
+								break
+							case "bar":
+								signalData.postfixMetric   = "kPa"
+								signalData.postfixImperial = "psi"
+								signalData.factor *= barTokiloPascalFactor
+								signalData.offset *= barTokiloPascalFactor
+								signalData.min    *= barTokiloPascalFactor
+								signalData.max    *= barTokiloPascalFactor
 								break
 							// Imperial sources; convert factor/offset/min/max so everything in our database is metric
 							// Note: this rarely happens in practice, OEMs almost always use SI/metric
