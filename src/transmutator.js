@@ -118,7 +118,7 @@ const parseDbc = (dbcString, options = {}) => {
 				}
 
 				try{
-					signalData = extractSignalData(line, currentBo.label, index + 1)
+					signalData = extractSignalData(line, currentBo.label, currentBo.name, index + 1)
 
 					// Since min|max = 0|0 is a default export setting, we allow this, but set them to undefined first
 					if(signalData.min === 0 && signalData.max === 0) {
@@ -136,6 +136,8 @@ const parseDbc = (dbcString, options = {}) => {
 						switch (signalData.sourceUnit.toLowerCase()) {
 							// Some .dbc editors require the unit field to not be empty
 							case "-":
+							case " ":
+							case "  ":
 							case "n/a":
 							case "none":
 								signalData.postfixMetric   = ""

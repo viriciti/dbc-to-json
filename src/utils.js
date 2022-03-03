@@ -17,7 +17,7 @@ const splitCanId = (canId) => {
 }
 
 // SG_ speed m1 : 8|8@1+ (1,-50) [-50|150] "km/h" Vector__XXX
-const extractSignalData = (line, labelPrefix, index) => {
+const extractSignalData = (line, labelPrefix, messageName, index) => {
 	let isMultiplexor, multiplexerValue, category, comment
 
 	if(line.length === 9 && line[3] === ":") {
@@ -42,7 +42,7 @@ const extractSignalData = (line, labelPrefix, index) => {
 	if(line[7] !== "Vector__XXX") {
 		category = line[7]
 	} else {
-		category = titleCase(labelPrefix)
+		category = messageName
 	}
 
 	// Automatically sets signed 1-bit signals to unsigned versions to save headaches in business logic later
