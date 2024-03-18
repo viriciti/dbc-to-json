@@ -396,8 +396,6 @@ const parseDbc = (dbcString, options = {}) => {
 	if(!_.isEmpty(currentBo))
 		boList.push(currentBo)
 
-	boList = _.reject(boList, ({pgn}) => pgn === 0)
-
 	if(options.filterDM1 === true)
 		boList = _.reject(boList, ({pgn}) => pgn === 65226)
 
