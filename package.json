@@ -1,6 +1,6 @@
 {
   "name": "@viriciti/dbc-to-json",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "",
   "main": "src/transmutator.js",
   "scripts": {
